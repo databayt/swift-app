@@ -1,0 +1,588 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "attendance.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Attendance" } }
+      }
+    },
+    "attendance.date" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التاريخ" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Date" } }
+      }
+    },
+    "attendance.status.present" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حاضر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Present" } }
+      }
+    },
+    "attendance.status.absent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غائب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Absent" } }
+      }
+    },
+    "attendance.status.late" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متأخر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Late" } }
+      }
+    },
+    "attendance.status.excused" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "معذور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Excused" } }
+      }
+    },
+    "attendance.status.sick" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مريض" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sick" } }
+      }
+    },
+    "attendance.status.holiday" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عطلة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Holiday" } }
+      }
+    },
+    "attendance.method.manual" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يدوي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Manual" } }
+      }
+    },
+    "attendance.method.qrCode" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رمز QR" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "QR Code" } }
+      }
+    },
+    "attendance.action.markClass" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل حضور الفصل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark Class Attendance" } }
+      }
+    },
+    "attendance.action.markStudent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل حضور طالب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark Student" } }
+      }
+    },
+    "attendance.action.submitExcuse" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تقديم عذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Submit Excuse" } }
+      }
+    },
+    "attendance.empty.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد سجلات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No Records" } }
+      }
+    },
+    "attendance.empty.teacher.message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يتم تسجيل أي حضور لهذا التاريخ" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No attendance recorded for this date" } }
+      }
+    },
+    "attendance.empty.student.message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سيظهر سجل حضورك هنا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your attendance history will appear here" } }
+      }
+    },
+    "attendance.empty.guardian.message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سيظهر سجل حضور ابنك هنا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your child's attendance will appear here" } }
+      }
+    },
+    "attendance.noAccess" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ليس لديك صلاحية الوصول للحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You don't have access to attendance" } }
+      }
+    },
+    "attendance.stats.rate" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نسبة الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Attendance Rate" } }
+      }
+    },
+    "attendance.stats.present" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حاضر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Present" } }
+      }
+    },
+    "attendance.stats.absent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غائب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Absent" } }
+      }
+    },
+    "attendance.stats.late" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متأخر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Late" } }
+      }
+    },
+    "attendance.qr.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مسح رمز QR" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scan QR Code" } }
+      }
+    },
+    "attendance.qr.instructions" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "وجه الكاميرا نحو رمز QR لتسجيل الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Point your camera at the QR code to check in" } }
+      }
+    },
+    "attendance.qr.scanning" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جاري المسح..." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scanning..." } }
+      }
+    },
+    "attendance.qr.processing" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جاري المعالجة..." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Processing..." } }
+      }
+    },
+    "attendance.qr.success" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم تسجيل الحضور بنجاح" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check-in successful!" } }
+      }
+    },
+    "attendance.qr.error" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فشل تسجيل الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check-in failed" } }
+      }
+    },
+    "attendance.qr.tryAgain" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حاول مرة أخرى" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Try Again" } }
+      }
+    },
+    "attendance.qr.cameraAccess" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوصول للكاميرا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Camera Access" } }
+      }
+    },
+    "attendance.qr.cameraAccessMessage" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نحتاج الوصول للكاميرا لمسح رموز QR" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "We need camera access to scan QR codes" } }
+      }
+    },
+    "attendance.qr.enableCamera" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تفعيل الكاميرا" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Enable Camera" } }
+      }
+    },
+    "attendance.qr.permissionRequired" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إذن مطلوب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Permission Required" } }
+      }
+    },
+    "attendance.qr.permissionMessage" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "يرجى تفعيل الوصول للكاميرا في الإعدادات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Please enable camera access in Settings" } }
+      }
+    },
+    "attendance.form.date" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "التاريخ" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Date" } }
+      }
+    },
+    "attendance.form.status" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الحالة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Status" } }
+      }
+    },
+    "attendance.form.notes" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ملاحظات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notes" } }
+      }
+    },
+    "attendance.form.quickSelect" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختيار سريع" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quick Select" } }
+      }
+    },
+    "attendance.form.markTitle" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark Attendance" } }
+      }
+    },
+    "attendance.form.markClassTitle" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل حضور الفصل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark Class Attendance" } }
+      }
+    },
+    "attendance.form.excuseTitle" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تقديم عذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Submit Excuse" } }
+      }
+    },
+    "attendance.form.reviewTitle" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مراجعة العذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Excuse" } }
+      }
+    },
+    "attendance.action.markAllPresent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل الكل حاضر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark All Present" } }
+      }
+    },
+    "attendance.action.markAllAbsent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل الكل غائب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark All Absent" } }
+      }
+    },
+    "attendance.action.quickMark" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل سريع" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quick Mark" } }
+      }
+    },
+    "attendance.excuse.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تقديم عذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Submit Excuse" } }
+      }
+    },
+    "attendance.excuse.date" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تاريخ الغياب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Absence Date" } }
+      }
+    },
+    "attendance.excuse.reason" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سبب الغياب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reason for Absence" } }
+      }
+    },
+    "attendance.excuse.document" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مستند داعم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Supporting Document" } }
+      }
+    },
+    "attendance.excuse.documentUrl" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رابط المستند" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Document URL" } }
+      }
+    },
+    "attendance.excuse.documentHint" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختياري: أضف رابط للتقرير الطبي أو المستند" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Optional: Add a link to medical report or document" } }
+      }
+    },
+    "attendance.excuse.details" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تفاصيل العذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Excuse Details" } }
+      }
+    },
+    "attendance.excuse.reviewNotes" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "ملاحظات المراجعة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Review Notes" } }
+      }
+    },
+    "attendance.excuse.viewDocument" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "عرض المستند" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "View Document" } }
+      }
+    },
+    "attendance.excuse.approve" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "قبول" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Approve" } }
+      }
+    },
+    "attendance.excuse.reject" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "رفض" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reject" } }
+      }
+    },
+    "attendance.success.marked" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم تسجيل الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Attendance marked" } }
+      }
+    },
+    "attendance.success.bulkMarked" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم تسجيل حضور الفصل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Class attendance marked" } }
+      }
+    },
+    "attendance.success.checkedIn" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم تسجيل الدخول" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checked in successfully" } }
+      }
+    },
+    "attendance.success.excuseSubmitted" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم تقديم العذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Excuse submitted" } }
+      }
+    },
+    "attendance.success.excuseApproved" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم قبول العذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Excuse approved" } }
+      }
+    },
+    "attendance.success.excuseRejected" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم رفض العذر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Excuse rejected" } }
+      }
+    },
+    "login.subtitle" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "سجل دخولك للمتابعة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign in to continue" } }
+      }
+    },
+    "login.email" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "البريد الإلكتروني" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Email" } }
+      }
+    },
+    "login.password" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كلمة المرور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Password" } }
+      }
+    },
+    "login.signIn" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل الدخول" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign In" } }
+      }
+    },
+    "login.or" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أو" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "or" } }
+      }
+    },
+    "login.continueWithGoogle" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المتابعة مع Google" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Continue with Google" } }
+      }
+    },
+    "students.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الطلاب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Students" } }
+      }
+    },
+    "grades.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الدرجات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Grades" } }
+      }
+    },
+    "grades.current" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الفصل الحالي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Current Semester" } }
+      }
+    },
+    "grades.history" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "السجل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "History" } }
+      }
+    },
+    "profile.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الملف الشخصي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Profile" } }
+      }
+    },
+    "profile.settings" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإعدادات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } }
+      }
+    },
+    "profile.editProfile" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل الملف" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit Profile" } }
+      }
+    },
+    "profile.notifications" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإشعارات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notifications" } }
+      }
+    },
+    "profile.language" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اللغة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Language" } }
+      }
+    },
+    "profile.appearance" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المظهر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Appearance" } }
+      }
+    },
+    "profile.support" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الدعم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Support" } }
+      }
+    },
+    "profile.help" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المساعدة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Help" } }
+      }
+    },
+    "profile.about" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حول التطبيق" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "About" } }
+      }
+    },
+    "profile.logout" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل الخروج" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign Out" } }
+      }
+    },
+    "profile.logout.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل الخروج" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign Out" } }
+      }
+    },
+    "profile.logout.message" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هل أنت متأكد من تسجيل الخروج؟" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Are you sure you want to sign out?" } }
+      }
+    },
+    "common.ok" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حسناً" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } }
+      }
+    },
+    "common.cancel" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } }
+      }
+    },
+    "common.save" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حفظ" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save" } }
+      }
+    },
+    "common.done" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } }
+      }
+    },
+    "common.submit" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إرسال" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Submit" } }
+      }
+    },
+    "common.delete" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حذف" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete" } }
+      }
+    },
+    "common.edit" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تعديل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit" } }
+      }
+    },
+    "common.settings" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الإعدادات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } }
+      }
+    },
+    "error.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خطأ" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Error" } }
+      }
+    },
+    "error.unauthorized" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غير مصرح" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unauthorized" } }
+      }
+    },
+    "success.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نجاح" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Success" } }
+      }
+    },
+    "filter.all" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الكل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All" } }
+      }
+    },
+    "validation.required" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذا الحقل مطلوب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This field is required" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
