@@ -1,0 +1,545 @@
+import SwiftUI
+
+/// Main attendance view
+/// Mirrors: src/components/platform/attendance/content.tsx
+struct AttendanceContent: View {
+    @Environment(AuthManager.self) private var authManager
+    @Environment(TenantContext.self) private var tenantContext
+    @State private var viewModel = AttendanceViewModel()
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Date picker
+                DatePicker(
+                    String(localized: "attendance.date"),
+                    selection: $viewModel.selectedDate,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.graphical)
+                .padding()
+                .onChange(of: viewModel.selectedDate) { _, newDate in
+                    Task { await viewModel.loadAttendanceForDate(newDate) }
+                }
+
+                Divider()
+
+                // Role-based content
+                Group {
+                    if viewModel.capabilities.canMarkAttendance {
+                        TeacherAttendanceContent(viewModel: viewModel)
+                    } else if viewModel.capabilities.canQRCheckIn {
+                        StudentAttendanceContent(viewModel: viewModel)
+                    } else if viewModel.capabilities.canSubmitExcuse {
+                        GuardianAttendanceContent(viewModel: viewModel)
+                    } else {
+                        ViewOnlyAttendanceContent(viewModel: viewModel)
+                    }
+                }
+            }
+            .navigationTitle(String(localized: "attendance.title"))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if viewModel.capabilities.canMarkAttendance {
+                        Menu {
+                            Button {
+                                viewModel.showMarkClassForm(classId: "")
+                            } label: {
+                                Label(
+                                    String(localized: "attendance.action.markClass"),
+                                    systemImage: "person.3"
+                                )
+                            }
+
+                            Button {
+                                viewModel.showMarkForm(studentId: "")
+                            } label: {
+                                Label(
+                                    String(localized: "attendance.action.markStudent"),
+                                    systemImage: "person"
+                                )
+                            }
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    } else if viewModel.capabilities.canQRCheckIn {
+                        Button {
+                            viewModel.showQRScanner()
+                        } label: {
+                            Image(systemName: "qrcode.viewfinder")
+                        }
+                    }
+                }
+            }
+            .sheet(isPresented: $viewModel.isShowingForm) {
+                if let mode = viewModel.formMode {
+                    AttendanceForm(
+                        mode: mode,
+                        viewModel: viewModel
+                    )
+                }
+            }
+            .sheet(isPresented: $viewModel.isShowingQRScanner) {
+                QRScannerView(viewModel: viewModel)
+            }
+            .sheet(isPresented: $viewModel.isShowingExcuseForm) {
+                if case .submitExcuse(let studentId, let date) = viewModel.formMode {
+                    ExcuseFormView(
+                        studentId: studentId,
+                        date: date,
+                        viewModel: viewModel
+                    )
+                }
+            }
+            .alert(
+                String(localized: "error.title"),
+                isPresented: $viewModel.showError,
+                presenting: viewModel.error
+            ) { _ in
+                Button(String(localized: "common.ok")) {}
+            } message: { error in
+                Text(error.localizedDescription)
+            }
+            .alert(
+                String(localized: "success.title"),
+                isPresented: $viewModel.showSuccess
+            ) {
+                Button(String(localized: "common.ok")) {}
+            } message: {
+                if let message = viewModel.successMessage {
+                    Text(message)
+                }
+            }
+            .task {
+                viewModel.setup(tenantContext: tenantContext, authManager: authManager)
+                await viewModel.loadAttendanceForDate(viewModel.selectedDate)
+                await viewModel.loadStats()
+            }
+        }
+    }
+}
+
+// MARK: - Teacher View
+
+struct TeacherAttendanceContent: View {
+    @Bindable var viewModel: AttendanceViewModel
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Stats summary (if viewing student)
+            if viewModel.filters.studentId != nil, let stats = viewModel.statsDisplay {
+                AttendanceStatsBar(stats: stats)
+            }
+
+            // Filter bar
+            AttendanceToolbar(viewModel: viewModel)
+
+            // Content
+            Group {
+                switch viewModel.viewState {
+                case .idle, .loading:
+                    LoadingView()
+
+                case .loaded:
+                    AttendanceTable(
+                        rows: viewModel.rows,
+                        canEdit: true,
+                        onEdit: { row in
+                            viewModel.showMarkForm(studentId: row.studentId)
+                        }
+                    )
+                    .refreshable {
+                        await viewModel.refresh()
+                    }
+
+                case .empty:
+                    EmptyStateView(
+                        title: String(localized: "attendance.empty.title"),
+                        message: String(localized: "attendance.empty.teacher.message"),
+                        systemImage: "calendar.badge.checkmark",
+                        action: {
+                            viewModel.showMarkClassForm(classId: "")
+                        },
+                        actionTitle: String(localized: "attendance.action.markClass")
+                    )
+
+                case .error(let error):
+                    ErrorStateView(
+                        error: error,
+                        retryAction: {
+                            Task { await viewModel.loadAttendance() }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Student View
+
+struct StudentAttendanceContent: View {
+    @Bindable var viewModel: AttendanceViewModel
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Stats card
+            if let stats = viewModel.statsDisplay {
+                AttendanceStatsCard(stats: stats)
+                    .padding()
+            }
+
+            // History
+            Group {
+                switch viewModel.viewState {
+                case .idle, .loading:
+                    LoadingView()
+
+                case .loaded:
+                    List {
+                        ForEach(viewModel.rows) { row in
+                            AttendanceHistoryRow(row: row)
+                        }
+                    }
+                    .listStyle(.plain)
+                    .refreshable {
+                        await viewModel.refresh()
+                    }
+
+                case .empty:
+                    EmptyStateView(
+                        title: String(localized: "attendance.empty.title"),
+                        message: String(localized: "attendance.empty.student.message"),
+                        systemImage: "calendar.badge.checkmark"
+                    )
+
+                case .error(let error):
+                    ErrorStateView(
+                        error: error,
+                        retryAction: {
+                            Task { await viewModel.loadAttendance() }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Guardian View
+
+struct GuardianAttendanceContent: View {
+    @Bindable var viewModel: AttendanceViewModel
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Stats card
+            if let stats = viewModel.statsDisplay {
+                AttendanceStatsCard(stats: stats)
+                    .padding()
+            }
+
+            // Excuse button
+            if AttendanceValidation.canSubmitExcuse(for: viewModel.selectedDate) {
+                Button {
+                    if let studentId = viewModel.filters.studentId {
+                        viewModel.showExcuseForm(studentId: studentId, date: viewModel.selectedDate)
+                    }
+                } label: {
+                    Label(
+                        String(localized: "attendance.action.submitExcuse"),
+                        systemImage: "doc.text"
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue.opacity(0.1))
+                    .foregroundStyle(.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .padding(.horizontal)
+            }
+
+            // History
+            Group {
+                switch viewModel.viewState {
+                case .idle, .loading:
+                    LoadingView()
+
+                case .loaded:
+                    List {
+                        ForEach(viewModel.rows) { row in
+                            AttendanceHistoryRow(row: row)
+                        }
+                    }
+                    .listStyle(.plain)
+                    .refreshable {
+                        await viewModel.refresh()
+                    }
+
+                case .empty:
+                    EmptyStateView(
+                        title: String(localized: "attendance.empty.title"),
+                        message: String(localized: "attendance.empty.guardian.message"),
+                        systemImage: "calendar.badge.checkmark"
+                    )
+
+                case .error(let error):
+                    ErrorStateView(
+                        error: error,
+                        retryAction: {
+                            Task { await viewModel.loadAttendance() }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+// MARK: - View Only
+
+struct ViewOnlyAttendanceContent: View {
+    @Bindable var viewModel: AttendanceViewModel
+
+    var body: some View {
+        VStack {
+            Image(systemName: "lock.fill")
+                .font(.largeTitle)
+                .foregroundStyle(.secondary)
+                .padding()
+
+            Text(String(localized: "attendance.noAccess"))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Toolbar
+
+struct AttendanceToolbar: View {
+    @Bindable var viewModel: AttendanceViewModel
+
+    var body: some View {
+        VStack(spacing: 12) {
+            // Filter chips
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    FilterChip(
+                        title: String(localized: "filter.all"),
+                        isSelected: viewModel.filters.status == nil,
+                        action: { viewModel.filterByStatus(nil) }
+                    )
+
+                    ForEach(AttendanceStatus.allCases, id: \.self) { status in
+                        FilterChip(
+                            title: status.displayName,
+                            isSelected: viewModel.filters.status == status,
+                            action: { viewModel.filterByStatus(status) }
+                        )
+                    }
+                }
+            }
+        }
+        .padding()
+    }
+}
+
+// MARK: - Stats Components
+
+struct AttendanceStatsBar: View {
+    let stats: AttendanceStatsDisplay
+
+    var body: some View {
+        HStack(spacing: 16) {
+            StatItem(
+                value: "\(Int(stats.attendanceRate))%",
+                label: String(localized: "attendance.stats.rate"),
+                color: stats.attendanceRate >= 90 ? .green : .orange
+            )
+
+            Divider()
+                .frame(height: 30)
+
+            StatItem(
+                value: "\(stats.presentDays)",
+                label: String(localized: "attendance.stats.present"),
+                color: .green
+            )
+
+            StatItem(
+                value: "\(stats.absentDays)",
+                label: String(localized: "attendance.stats.absent"),
+                color: .red
+            )
+
+            StatItem(
+                value: "\(stats.lateDays)",
+                label: String(localized: "attendance.stats.late"),
+                color: .orange
+            )
+        }
+        .padding()
+        .background(.quaternary)
+    }
+}
+
+struct AttendanceStatsCard: View {
+    let stats: AttendanceStatsDisplay
+
+    var body: some View {
+        VStack(spacing: 16) {
+            // Attendance rate
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(String(localized: "attendance.stats.rate"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Text("\(Int(stats.attendanceRate))%")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundStyle(stats.attendanceRate >= 90 ? .green : .orange)
+                }
+
+                Spacer()
+
+                // Circular progress
+                ZStack {
+                    Circle()
+                        .stroke(.secondary.opacity(0.2), lineWidth: 8)
+                    Circle()
+                        .trim(from: 0, to: stats.attendanceRate / 100)
+                        .stroke(stats.attendanceRate >= 90 ? .green : .orange, lineWidth: 8)
+                        .rotationEffect(.degrees(-90))
+                }
+                .frame(width: 60, height: 60)
+            }
+
+            // Breakdown
+            HStack(spacing: 20) {
+                StatPill(
+                    count: stats.presentDays,
+                    label: String(localized: "attendance.status.present"),
+                    color: .green
+                )
+                StatPill(
+                    count: stats.absentDays,
+                    label: String(localized: "attendance.status.absent"),
+                    color: .red
+                )
+                StatPill(
+                    count: stats.lateDays,
+                    label: String(localized: "attendance.status.late"),
+                    color: .orange
+                )
+            }
+        }
+        .padding()
+        .background(.quaternary)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct StatItem: View {
+    let value: String
+    let label: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.headline)
+                .foregroundStyle(color)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+struct StatPill: View {
+    let count: Int
+    let label: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 8, height: 8)
+            Text("\(count)")
+                .font(.subheadline)
+                .fontWeight(.medium)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - History Row
+
+struct AttendanceHistoryRow: View {
+    let row: AttendanceRow
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Status icon
+            Image(systemName: row.status.icon)
+                .font(.title2)
+                .foregroundStyle(statusColor)
+                .frame(width: 40)
+
+            // Details
+            VStack(alignment: .leading, spacing: 4) {
+                Text(row.date, style: .date)
+                    .font(.headline)
+
+                if let className = row.className {
+                    Text(className)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                if let notes = row.notes, !notes.isEmpty {
+                    Text(notes)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer()
+
+            // Status badge
+            Text(row.status.displayName)
+                .font(.caption)
+                .fontWeight(.medium)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(statusColor.opacity(0.2))
+                .foregroundStyle(statusColor)
+                .clipShape(Capsule())
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var statusColor: Color {
+        switch row.status {
+        case .present: return .green
+        case .absent: return .red
+        case .late: return .orange
+        case .excused: return .blue
+        case .sick: return .purple
+        case .holiday: return .gray
+        }
+    }
+}
+
+// MARK: - Preview
+
+#Preview {
+    AttendanceContent()
+        .environment(AuthManager())
+        .environment(TenantContext())
+}

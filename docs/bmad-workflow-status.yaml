@@ -1,0 +1,307 @@
+---
+# BMAD Workflow Status
+# Hogwarts iOS App
+
+project: hogwarts-ios
+version: 1.0.0
+created_at: 2025-12-17
+updated_at: 2025-12-17
+
+# Current Position
+current_phase: solutioning
+current_sprint: null  # Not started yet
+
+# BMAD Phases
+phases:
+  analysis:
+    status: complete
+    started_at: 2025-12-17
+    completed_at: 2025-12-17
+    artifacts:
+      - docs/prd.md
+
+  planning:
+    status: complete
+    started_at: 2025-12-17
+    completed_at: 2025-12-17
+    artifacts:
+      - .claude/CLAUDE.md
+      - .claude/commands/ios-analyst.md
+      - .claude/commands/ios-architect.md
+      - .claude/commands/ios-dev.md
+      - .claude/commands/ios-qa.md
+      - .claude/commands/ios-ui.md
+      - .claude/commands/ios-status.md
+      - .claude/commands/ios-next.md
+
+  solutioning:
+    status: in_progress
+    started_at: 2025-12-17
+    completed_at: null
+    artifacts:
+      - docs/architecture.md
+      - docs/data-models.md  # pending
+      - docs/api-spec.md     # pending
+
+  implementation:
+    status: pending
+    started_at: null
+    completed_at: null
+    sprints: []
+
+# Epics
+epics:
+  - id: EPIC-001
+    name: Authentication
+    priority: P0
+    sprint: 1
+    status: pending
+    stories:
+      - id: AUTH-001
+        title: Google OAuth Sign-In
+        status: pending
+        priority: P0
+      - id: AUTH-002
+        title: Facebook OAuth Sign-In
+        status: pending
+        priority: P0
+      - id: AUTH-003
+        title: Email/Password Login
+        status: pending
+        priority: P0
+      - id: AUTH-004
+        title: School Selection
+        status: pending
+        priority: P0
+      - id: AUTH-005
+        title: Biometric Unlock
+        status: pending
+        priority: P1
+      - id: AUTH-006
+        title: Session Management
+        status: pending
+        priority: P0
+
+  - id: EPIC-002
+    name: Dashboard
+    priority: P0
+    sprint: 1-2
+    status: pending
+    stories:
+      - id: DASH-001
+        title: Student Dashboard
+        status: pending
+        priority: P0
+      - id: DASH-002
+        title: Teacher Dashboard
+        status: pending
+        priority: P0
+      - id: DASH-003
+        title: Guardian Dashboard
+        status: pending
+        priority: P0
+      - id: DASH-004
+        title: Admin Dashboard
+        status: pending
+        priority: P1
+
+  - id: EPIC-003
+    name: Attendance
+    priority: P0
+    sprint: 2
+    status: pending
+    stories:
+      - id: ATT-001
+        title: View Attendance History
+        status: pending
+        priority: P0
+      - id: ATT-002
+        title: Mark Attendance (Teacher)
+        status: pending
+        priority: P0
+      - id: ATT-003
+        title: QR Code Check-in
+        status: pending
+        priority: P1
+      - id: ATT-004
+        title: Submit Excuse (Guardian)
+        status: pending
+        priority: P1
+
+  - id: EPIC-004
+    name: Grades
+    priority: P0
+    sprint: 2
+    status: pending
+    stories:
+      - id: GRADE-001
+        title: View Exam Results
+        status: pending
+        priority: P0
+      - id: GRADE-002
+        title: Report Card Display
+        status: pending
+        priority: P0
+      - id: GRADE-003
+        title: Grade History Charts
+        status: pending
+        priority: P1
+
+  - id: EPIC-005
+    name: Timetable
+    priority: P1
+    sprint: 3
+    status: pending
+    stories:
+      - id: TIME-001
+        title: Weekly Schedule View
+        status: pending
+        priority: P0
+      - id: TIME-002
+        title: Daily Timeline View
+        status: pending
+        priority: P1
+      - id: TIME-003
+        title: Class Details
+        status: pending
+        priority: P1
+
+  - id: EPIC-006
+    name: Messaging
+    priority: P1
+    sprint: 3
+    status: pending
+    stories:
+      - id: MSG-001
+        title: Conversation List
+        status: pending
+        priority: P0
+      - id: MSG-002
+        title: Chat Interface
+        status: pending
+        priority: P0
+      - id: MSG-003
+        title: Send/Receive Messages
+        status: pending
+        priority: P0
+      - id: MSG-004
+        title: Push Notifications
+        status: pending
+        priority: P0
+
+  - id: EPIC-007
+    name: Profile & Settings
+    priority: P2
+    sprint: 4
+    status: pending
+    stories:
+      - id: PROF-001
+        title: Profile View
+        status: pending
+        priority: P0
+      - id: PROF-002
+        title: Edit Profile
+        status: pending
+        priority: P1
+      - id: PROF-003
+        title: Language Toggle
+        status: pending
+        priority: P0
+      - id: PROF-004
+        title: Notification Settings
+        status: pending
+        priority: P1
+
+# Sprint Plan
+sprints:
+  - number: 1
+    name: Foundation
+    status: pending
+    started_at: null
+    completed_at: null
+    goals:
+      - Project setup + BMAD configuration
+      - SwiftData schema
+      - Core networking layer
+      - Sync engine foundation
+      - Authentication module
+    stories:
+      - AUTH-001
+      - AUTH-002
+      - AUTH-003
+      - AUTH-004
+      - AUTH-006
+
+  - number: 2
+    name: Core Features
+    status: pending
+    started_at: null
+    completed_at: null
+    goals:
+      - Dashboard for all roles
+      - Attendance module
+      - Grades module
+      - APNs setup
+    stories:
+      - DASH-001
+      - DASH-002
+      - DASH-003
+      - ATT-001
+      - ATT-002
+      - GRADE-001
+      - GRADE-002
+
+  - number: 3
+    name: Communication
+    status: pending
+    started_at: null
+    completed_at: null
+    goals:
+      - Timetable module
+      - Messaging module
+      - Notifications
+    stories:
+      - TIME-001
+      - TIME-002
+      - MSG-001
+      - MSG-002
+      - MSG-003
+      - MSG-004
+
+  - number: 4
+    name: Completion
+    status: pending
+    started_at: null
+    completed_at: null
+    goals:
+      - Profile & Settings
+      - Full localization
+      - Testing
+      - TestFlight prep
+    stories:
+      - PROF-001
+      - PROF-002
+      - PROF-003
+      - AUTH-005
+      - ATT-003
+      - ATT-004
+
+  - number: 5
+    name: Polish
+    status: pending
+    started_at: null
+    completed_at: null
+    goals:
+      - Performance optimization
+      - Edge cases
+      - Beta feedback
+      - App Store submission
+
+# Blockers
+blockers: []
+
+# Notes
+notes:
+  - "Offline-first architecture requires careful sync implementation"
+  - "APNs setup requires Apple Developer account configuration"
+  - "All 8 user roles need distinct dashboard experiences"
