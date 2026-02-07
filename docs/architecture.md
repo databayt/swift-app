@@ -1,8 +1,8 @@
 # Technical Architecture
 ## Hogwarts iOS App
 
-**Version**: 1.0
-**Last Updated**: 2025-12-17
+**Version**: 2.0
+**Last Updated**: 2026-02-08
 
 ---
 
@@ -11,49 +11,33 @@
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         iOS App                                  │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │                    Presentation Layer                      │ │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐      │ │
-│  │  │  Auth   │  │Dashboard│  │Attendance│  │ Grades │  ... │ │
-│  │  │  Views  │  │  Views  │  │  Views  │  │ Views  │      │ │
-│  │  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘      │ │
-│  └───────┼────────────┼───────────┼───────────┼─────────────┘ │
-│          ▼            ▼           ▼           ▼               │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │                    ViewModel Layer                         │ │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐      │ │
-│  │  │  Auth   │  │Dashboard│  │Attendance│  │ Grades │  ... │ │
-│  │  │   VM    │  │   VM    │  │    VM   │  │   VM   │      │ │
-│  │  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘      │ │
-│  └───────┼────────────┼───────────┼───────────┼─────────────┘ │
-│          ▼            ▼           ▼           ▼               │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │                    Domain Layer                            │ │
-│  │  ┌─────────────────────────────────────────────────────┐  │ │
-│  │  │                    UseCases                          │  │ │
-│  │  │  LoginUseCase, GetStudentsUseCase, MarkAttendance... │  │ │
-│  │  └─────────────────────────┬───────────────────────────┘  │ │
-│  └────────────────────────────┼──────────────────────────────┘ │
-│                               ▼                                 │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │                     Data Layer                             │ │
-│  │  ┌─────────────────┐         ┌─────────────────────────┐  │ │
-│  │  │   Repositories  │         │      Data Sources       │  │ │
-│  │  │                 │    ┌───▶│  ┌──────────────────┐   │  │ │
-│  │  │ StudentRepo     │────┤    │  │   SwiftData      │   │  │ │
-│  │  │ AttendanceRepo  │    │    │  │   (Local DB)     │   │  │ │
-│  │  │ GradeRepo       │    │    │  └──────────────────┘   │  │ │
-│  │  │ ...             │    │    │  ┌──────────────────┐   │  │ │
-│  │  │                 │    └───▶│  │   APIClient      │   │  │ │
-│  │  │                 │         │  │   (Remote API)   │   │  │ │
-│  │  └─────────────────┘         │  └──────────────────┘   │  │ │
-│  └───────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
+│                                                                   │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │                  Presentation Layer                         │  │
+│  │  Auth │ Dashboard │ Students │ Attendance │ Grades │ ...   │  │
+│  │  Views   Views      Views      Views        Views          │  │
+│  └──────────────────────────┬─────────────────────────────────┘  │
+│                              │                                    │
+│  ┌──────────────────────────┴─────────────────────────────────┐  │
+│  │                  ViewModel Layer                             │  │
+│  │  @Observable + @MainActor ViewModels                        │  │
+│  └──────────────────────────┬─────────────────────────────────┘  │
+│                              │                                    │
+│  ┌──────────────────────────┴─────────────────────────────────┐  │
+│  │                  Actions Layer                               │  │
+│  │  Feature-specific API operations (mirrors web actions.ts)   │  │
+│  └──────────┬───────────────────────────────┬─────────────────┘  │
+│             │                               │                     │
+│  ┌──────────┴──────────┐  ┌────────────────┴──────────────────┐  │
+│  │    APIClient        │  │    SwiftData + SyncEngine         │  │
+│  │    (Remote)         │  │    (Local + Offline Queue)        │  │
+│  └──────────┬──────────┘  └───────────────────────────────────┘  │
+└─────────────┼─────────────────────────────────────────────────────┘
+              │
+              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                     Hogwarts Backend                             │
-│                   (Next.js API Server)                           │
+│                     Hogwarts Backend                              │
+│                   (Next.js API Server)                            │
 │                  https://ed.databayt.org/api                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -63,46 +47,178 @@
 ## 2. Layer Responsibilities
 
 ### 2.1 Presentation Layer
-- SwiftUI Views
-- UI state management
-- Navigation
-- Localization
+- SwiftUI Views (declarative UI)
+- Navigation (NavigationStack, TabView)
+- Localization (Localizable.xcstrings)
+- Accessibility (VoiceOver, Dynamic Type)
 
 ### 2.2 ViewModel Layer
-- Business logic for views
-- State transformation
-- Error handling
-- Loading states
+- `@Observable` + `@MainActor` classes
+- State management (loading, error, data)
+- User action handling
+- Data transformation for display
 
-### 2.3 Domain Layer
-- Business rules
-- Use cases (single responsibility)
-- Domain models
+### 2.3 Actions Layer
+- Async API operations (mirrors web `actions.ts`)
+- Input validation (mirrors web `validation.ts`)
+- Request/response type definitions
+- Offline queue integration
 
 ### 2.4 Data Layer
-- Repository pattern (abstraction)
-- Data sources (local + remote)
-- Caching strategy
-- Sync logic
+- APIClient: HTTP requests with JWT auth
+- SwiftData: Local persistence and cache
+- SyncEngine: Offline queue processing
+- NetworkMonitor: Connectivity detection
 
 ---
 
-## 3. Core Components
+## 3. Navigation Architecture
 
-### 3.1 Network Layer
+### 3.1 Tab Structure
 
 ```swift
-// Core/Network/APIClient.swift
+enum AppTab: String, CaseIterable {
+    case dashboard
+    case attendance
+    case grades
+    case messages
+    case profile
+}
+```
+
+Tabs are role-dependent:
+| Role | Tabs |
+|------|------|
+| Student | Dashboard, Grades, Timetable, Messages, Profile |
+| Teacher | Dashboard, Attendance, Grades, Messages, Profile |
+| Guardian | Dashboard, Grades, Messages, Profile |
+| Admin | Dashboard, Students, Attendance, Messages, Profile |
+
+### 3.2 Navigation Routes
+
+```swift
+enum AppRoute: Hashable {
+    // Dashboard
+    case dashboard
+
+    // Students
+    case students
+    case studentDetail(id: String)
+    case studentForm(id: String?)
+
+    // Attendance
+    case attendance
+    case attendanceForm(classId: String)
+    case attendanceHistory(studentId: String)
+
+    // Grades
+    case grades
+    case gradeDetail(studentId: String, subjectId: String)
+    case reportCard(studentId: String, termId: String)
+
+    // Messages
+    case conversations
+    case conversation(id: String)
+    case newMessage
+
+    // Profile
+    case profile
+    case settings
+    case languageSettings
+}
+```
+
+### 3.3 Navigation Pattern
+
+```swift
+// Each tab has its own NavigationStack
+TabView(selection: $selectedTab) {
+    NavigationStack(path: $dashboardPath) {
+        DashboardContent()
+            .navigationDestination(for: AppRoute.self) { route in
+                routeView(for: route)
+            }
+    }
+    .tabItem { Label("dashboard", systemImage: "house") }
+    .tag(AppTab.dashboard)
+
+    // ... more tabs
+}
+```
+
+---
+
+## 4. Dependency Injection
+
+### 4.1 Environment-Based DI
+
+```swift
+// Custom environment keys
+struct SchoolIdKey: EnvironmentKey {
+    static let defaultValue: String = ""
+}
+
+struct APIClientKey: EnvironmentKey {
+    static let defaultValue = APIClient.shared
+}
+
+extension EnvironmentValues {
+    var schoolId: String {
+        get { self[SchoolIdKey.self] }
+        set { self[SchoolIdKey.self] = newValue }
+    }
+
+    var apiClient: APIClient {
+        get { self[APIClientKey.self] }
+        set { self[APIClientKey.self] = newValue }
+    }
+}
+
+// Injected at app root
+@main
+struct HogwartsApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environment(\.schoolId, authManager.schoolId ?? "")
+                .environment(\.apiClient, APIClient.shared)
+        }
+        .modelContainer(DataContainer.shared.container)
+    }
+}
+```
+
+### 4.2 Protocol-Based Abstraction (for Testing)
+
+```swift
+protocol StudentActionsProtocol {
+    func fetchStudents(schoolId: String) async throws -> [StudentRow]
+    func createStudent(_ data: CreateStudentRequest, schoolId: String) async throws -> StudentRow
+}
+
+// Production
+struct StudentsActions: StudentActionsProtocol { ... }
+
+// Testing
+class MockStudentsActions: StudentActionsProtocol { ... }
+```
+
+---
+
+## 5. Core Components
+
+### 5.1 APIClient
+
+```swift
 actor APIClient {
+    static let shared = APIClient(
+        baseURL: URL(string: "https://ed.databayt.org/api")!,
+        authManager: AuthManager.shared
+    )
+
     private let session: URLSession
     private let baseURL: URL
     private let authManager: AuthManager
-
-    init(baseURL: URL, authManager: AuthManager) {
-        self.baseURL = baseURL
-        self.authManager = authManager
-        self.session = URLSession(configuration: .default)
-    }
 
     func request<T: Decodable>(
         _ endpoint: Endpoint,
@@ -123,54 +239,31 @@ actor APIClient {
 
         switch httpResponse.statusCode {
         case 200...299:
-            return try JSONDecoder().decode(T.self, from: data)
+            return try JSONDecoder.iso8601.decode(T.self, from: data)
         case 401:
             throw APIError.unauthorized
+        case 403:
+            throw APIError.forbidden
         case 404:
             throw APIError.notFound
+        case 422:
+            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+            throw APIError.validationFailed(errorResponse?.error ?? "Validation failed")
         default:
             throw APIError.serverError(httpResponse.statusCode)
         }
     }
 }
-
-// Core/Network/Endpoint.swift
-struct Endpoint {
-    let path: String
-    let method: HTTPMethod
-    let queryItems: [URLQueryItem]?
-    let body: Encodable?
-
-    func urlRequest(baseURL: URL) -> URLRequest {
-        var url = baseURL.appendingPathComponent(path)
-
-        if let queryItems = queryItems {
-            var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
-            components.queryItems = queryItems
-            url = components.url!
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = method.rawValue
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        if let body = body {
-            request.httpBody = try? JSONEncoder().encode(body)
-        }
-
-        return request
-    }
-}
 ```
 
-### 3.2 Auth Manager
+### 5.2 AuthManager
 
 ```swift
-// Core/Auth/AuthManager.swift
 @Observable
 class AuthManager {
-    private let keychain: KeychainService
-    private let apiClient: APIClient
+    static let shared = AuthManager()
+
+    private let keychain = KeychainService()
 
     var isAuthenticated: Bool { accessToken != nil }
     var currentUser: User?
@@ -180,313 +273,172 @@ class AuthManager {
         keychain.get(.accessToken)
     }
 
-    func signIn(email: String, password: String) async throws -> Session {
-        let session = try await apiClient.request(
-            .signIn(email: email, password: password),
-            responseType: Session.self
-        )
-
-        try keychain.save(session.accessToken, for: .accessToken)
-        currentUser = session.user
-        schoolId = session.schoolId
-
-        return session
-    }
-
-    func signInWithGoogle() async throws -> Session {
-        // Google Sign-In flow
-        let googleToken = try await GoogleSignIn.signIn()
-        let session = try await apiClient.request(
-            .signInWithProvider(provider: "google", token: googleToken),
-            responseType: Session.self
-        )
-
-        try keychain.save(session.accessToken, for: .accessToken)
-        currentUser = session.user
-        schoolId = session.schoolId
-
-        return session
-    }
-
-    func signOut() {
-        keychain.delete(.accessToken)
-        currentUser = nil
-        schoolId = nil
-    }
+    func signIn(email: String, password: String) async throws -> Session { ... }
+    func signInWithGoogle() async throws -> Session { ... }
+    func signInWithFacebook() async throws -> Session { ... }
+    func signOut() { ... }
 }
 ```
 
-### 3.3 SwiftData Container
+### 5.3 SyncEngine
 
 ```swift
-// Core/Storage/SwiftDataContainer.swift
-import SwiftData
-
-@MainActor
-class DataContainer {
-    static let shared = DataContainer()
-
-    let container: ModelContainer
-
-    private init() {
-        let schema = Schema([
-            User.self,
-            School.self,
-            Student.self,
-            Teacher.self,
-            Attendance.self,
-            ExamResult.self,
-            Message.self,
-            Notification.self,
-            PendingAction.self
-        ])
-
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false
-        )
-
-        container = try! ModelContainer(for: schema, configurations: config)
-    }
-
-    var modelContext: ModelContext {
-        container.mainContext
-    }
-}
-```
-
-### 3.4 Sync Engine
-
-```swift
-// Core/Storage/SyncEngine.swift
 actor SyncEngine {
+    static let shared = SyncEngine()
+
     private let apiClient: APIClient
     private let modelContext: ModelContext
     private let networkMonitor: NetworkMonitor
 
     // Full sync on app launch
-    func syncAll() async throws {
+    func syncAll(schoolId: String) async throws {
         guard networkMonitor.isConnected else { return }
 
-        // Process pending actions first
+        // Process offline queue first
         try await processPendingActions()
 
-        // Then sync data
-        async let users = syncUsers()
-        async let students = syncStudents()
-        async let attendance = syncAttendance()
-
-        _ = try await (users, students, attendance)
+        // Then sync data in parallel
+        async let students = syncStudents(schoolId: schoolId)
+        async let attendance = syncAttendance(schoolId: schoolId)
+        async let grades = syncGrades(schoolId: schoolId)
+        _ = try await (students, attendance, grades)
     }
 
-    // Queue action for offline
-    func queueAction(
-        endpoint: String,
-        method: HTTPMethod,
-        payload: Data?
-    ) async {
-        let action = PendingAction(
-            id: UUID(),
-            endpoint: endpoint,
-            method: method.rawValue,
-            payload: payload,
-            createdAt: Date(),
-            status: .pending
-        )
+    // Queue offline action
+    func queueAction(endpoint: String, method: String, payload: Data?) async { ... }
 
-        modelContext.insert(action)
-        try? modelContext.save()
+    // Process queue when online
+    func processPendingActions() async throws { ... }
+}
+```
 
-        // Try to sync immediately if online
-        if networkMonitor.isConnected {
-            try? await processPendingActions()
-        }
-    }
+### 5.4 NetworkMonitor
 
-    private func processPendingActions() async throws {
-        let descriptor = FetchDescriptor<PendingAction>(
-            predicate: #Predicate { $0.status == .pending },
-            sortBy: [SortDescriptor(\.createdAt)]
-        )
+```swift
+@Observable
+class NetworkMonitor {
+    static let shared = NetworkMonitor()
 
-        let pendingActions = try modelContext.fetch(descriptor)
+    var isConnected = true
 
-        for action in pendingActions {
-            action.status = .syncing
-            try? modelContext.save()
-
-            do {
-                try await executeAction(action)
-                action.status = .completed
-            } catch {
-                action.status = .failed
-                action.retryCount += 1
-                action.errorMessage = error.localizedDescription
+    init() {
+        let monitor = NWPathMonitor()
+        monitor.pathUpdateHandler = { [weak self] path in
+            Task { @MainActor in
+                self?.isConnected = path.status == .satisfied
             }
+        }
+        monitor.start(queue: DispatchQueue(label: "NetworkMonitor"))
+    }
+}
+```
 
-            try? modelContext.save()
+---
+
+## 6. Error Handling Strategy
+
+### 6.1 Error Types
+
+```swift
+enum APIError: LocalizedError {
+    case unauthorized
+    case forbidden
+    case notFound
+    case validationFailed(String)
+    case serverError(Int)
+    case networkOffline
+    case invalidResponse
+    case decodingFailed(Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .unauthorized: String(localized: "error_unauthorized")
+        case .forbidden: String(localized: "error_forbidden")
+        case .notFound: String(localized: "error_not_found")
+        case .validationFailed(let msg): msg
+        case .serverError(let code): String(localized: "error_server_\(code)")
+        case .networkOffline: String(localized: "error_offline")
+        case .invalidResponse: String(localized: "error_invalid_response")
+        case .decodingFailed: String(localized: "error_decoding")
         }
     }
 }
 ```
 
----
-
-## 4. Data Models
-
-### 4.1 Core Models
+### 6.2 ViewState Mapping
 
 ```swift
-// Shared/Models/User.swift
-import SwiftData
-
-@Model
-class User {
-    @Attribute(.unique) var id: String
-    var email: String
-    var name: String
-    var nameAr: String?
-    var role: String  // UserRole raw value
-    var schoolId: String?
-    var imageUrl: String?
-    var phone: String?
-
-    // Sync metadata
-    var lastSyncedAt: Date?
-    var isLocalOnly: Bool = false
-
-    var userRole: UserRole {
-        UserRole(rawValue: role) ?? .user
-    }
-
-    init(id: String, email: String, name: String, role: String, schoolId: String?) {
-        self.id = id
-        self.email = email
-        self.name = name
-        self.role = role
-        self.schoolId = schoolId
-    }
-}
-
-enum UserRole: String, Codable {
-    case developer = "DEVELOPER"
-    case admin = "ADMIN"
-    case teacher = "TEACHER"
-    case student = "STUDENT"
-    case guardian = "GUARDIAN"
-    case accountant = "ACCOUNTANT"
-    case staff = "STAFF"
-    case user = "USER"
+enum ViewState<T> {
+    case idle
+    case loading
+    case loaded(T)
+    case empty
+    case error(String)
+    case offline(T?)  // Cached data available
 }
 ```
 
-```swift
-// Shared/Models/Student.swift
-@Model
-class Student {
-    @Attribute(.unique) var id: String
-    var grNumber: String
-    var userId: String
-    var schoolId: String
-    var yearLevelId: String?
-    var status: String  // StudentStatus
+### 6.3 Error to Action Mapping
 
-    // Relationships
-    @Relationship(inverse: \Attendance.student)
-    var attendanceRecords: [Attendance] = []
-
-    @Relationship(inverse: \ExamResult.student)
-    var examResults: [ExamResult] = []
-
-    // Sync metadata
-    var lastSyncedAt: Date?
-
-    init(id: String, grNumber: String, userId: String, schoolId: String) {
-        self.id = id
-        self.grNumber = grNumber
-        self.userId = userId
-        self.schoolId = schoolId
-    }
-}
-```
-
-```swift
-// Shared/Models/Attendance.swift
-@Model
-class Attendance {
-    @Attribute(.unique) var id: String
-    var studentId: String
-    var classId: String?
-    var date: Date
-    var status: String  // PRESENT, ABSENT, LATE, EXCUSED
-    var method: String? // MANUAL, QR_CODE, etc.
-    var schoolId: String
-
-    var student: Student?
-
-    var lastSyncedAt: Date?
-    var isLocalOnly: Bool = false
-
-    init(id: String, studentId: String, date: Date, status: String, schoolId: String) {
-        self.id = id
-        self.studentId = studentId
-        self.date = date
-        self.status = status
-        self.schoolId = schoolId
-    }
-}
-```
-
-### 4.2 Pending Action Model
-
-```swift
-// Shared/Models/PendingAction.swift
-@Model
-class PendingAction {
-    @Attribute(.unique) var id: UUID
-    var endpoint: String
-    var method: String
-    var payload: Data?
-    var createdAt: Date
-    var retryCount: Int
-    var status: String  // SyncStatus
-    var errorMessage: String?
-
-    var syncStatus: SyncStatus {
-        SyncStatus(rawValue: status) ?? .pending
-    }
-
-    init(
-        id: UUID,
-        endpoint: String,
-        method: String,
-        payload: Data?,
-        createdAt: Date,
-        status: SyncStatus
-    ) {
-        self.id = id
-        self.endpoint = endpoint
-        self.method = method
-        self.payload = payload
-        self.createdAt = createdAt
-        self.retryCount = 0
-        self.status = status.rawValue
-    }
-}
-
-enum SyncStatus: String, Codable {
-    case pending
-    case syncing
-    case completed
-    case failed
-}
-```
+| Error | User-Facing Action |
+|-------|--------------------|
+| `unauthorized` | Redirect to login |
+| `forbidden` | Show "Permission denied" |
+| `notFound` | Show "Not found" with back button |
+| `validationFailed` | Show field-level errors |
+| `serverError` | Show "Something went wrong" + retry |
+| `networkOffline` | Show offline banner + cached data |
 
 ---
 
-## 5. API Endpoints
+## 7. SwiftData Schema
 
-### 5.1 Authentication
+### 7.1 Core Models (Sprint 1)
+
+```swift
+@Model class User { ... }        // Auth & profile
+@Model class School { ... }      // Tenant info
+@Model class PendingAction { ... } // Offline queue
+```
+
+### 7.2 Feature Models (Sprint 2)
+
+```swift
+@Model class Student { ... }     // Student records
+@Model class Attendance { ... }  // Attendance records
+@Model class ExamResult { ... }  // Grade results
+@Model class ReportCard { ... }  // Term summaries
+@Model class Class { ... }       // Class/section
+@Model class Subject { ... }     // Academic subjects
+@Model class YearLevel { ... }   // Grade levels
+```
+
+### 7.3 Communication Models (Sprint 3)
+
+```swift
+@Model class Message { ... }           // Chat messages
+@Model class Conversation { ... }      // Chat threads
+@Model class Notification { ... }      // Push notifications
+@Model class Period { ... }            // Timetable periods
+```
+
+### 7.4 Model Categories from Web (209+ Prisma Models)
+
+| Category | Key Models | iOS Sprint |
+|----------|-----------|-----------|
+| Auth | User, Account, School | Sprint 1 |
+| Students | Student, Guardian, StudentClass | Sprint 2 |
+| Attendance | Attendance, AttendanceExcuse | Sprint 2 |
+| Grades | ExamResult, ReportCard, GradeBoundary | Sprint 2 |
+| Timetable | Period, Class, Classroom | Sprint 3 |
+| Messages | Message, Conversation | Sprint 3 |
+| Notifications | Notification, NotificationPreference | Sprint 3 |
+
+---
+
+## 8. API Endpoints
+
+### 8.1 Authentication
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -495,31 +447,34 @@ enum SyncStatus: String, Codable {
 | `/api/auth/signout` | POST | Sign out |
 | `/api/auth/callback/{provider}` | POST | OAuth callback |
 
-### 5.2 Students
+### 8.2 Students
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/students` | GET | List students (filtered by schoolId) |
+| `/api/students?schoolId={id}` | GET | List students (paginated) |
 | `/api/students/{id}` | GET | Get student details |
-| `/api/students/{id}/attendance` | GET | Student attendance history |
-| `/api/students/{id}/grades` | GET | Student grades |
+| `/api/students` | POST | Create student |
+| `/api/students/{id}` | PUT | Update student |
+| `/api/students/{id}` | DELETE | Delete student |
 
-### 5.3 Attendance
+### 8.3 Attendance
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/attendance` | GET | List attendance records |
+| `/api/attendance?schoolId={id}` | GET | List attendance records |
 | `/api/attendance` | POST | Mark attendance |
 | `/api/attendance/qr` | POST | QR-based check-in |
+| `/api/attendance/excuse` | POST | Submit excuse |
 
-### 5.4 Grades
+### 8.4 Grades
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/grades` | GET | List grades |
+| `/api/grades?schoolId={id}` | GET | List grades |
 | `/api/grades/report-card/{studentId}` | GET | Get report card |
+| `/api/grades` | POST | Enter grades |
 
-### 5.5 Messages
+### 8.5 Messages
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -529,9 +484,9 @@ enum SyncStatus: String, Codable {
 
 ---
 
-## 6. Offline Strategy
+## 9. Offline Strategy
 
-### 6.1 Caching Policy
+### 9.1 Caching Policy
 
 | Data Type | Cache Duration | Sync Trigger |
 |-----------|---------------|--------------|
@@ -542,133 +497,90 @@ enum SyncStatus: String, Codable {
 | Timetable | 1 week | App launch |
 | Messages | Indefinite | Real-time + periodic |
 
-### 6.2 Conflict Resolution
+### 9.2 Conflict Resolution Matrix
 
-| Scenario | Resolution |
-|----------|------------|
-| Attendance marked offline | Server wins (official record) |
-| Message sent offline | Merge by timestamp |
-| Profile edited offline | Last-write-wins |
-| Grade viewed offline | Server wins (read-only) |
+| Entity | Strategy | Rule | Reason |
+|--------|----------|------|--------|
+| Attendance | Server wins | Overwrite local | Official record |
+| Grades | Server wins | Overwrite local | Read-only for most |
+| Messages | Merge | Append by timestamp | Both sides create |
+| Profile | Last-write-wins | Compare updatedAt | Single editor |
+| Students | Server wins | Overwrite local | Admin authority |
 
-### 6.3 Queue Processing
+### 9.3 Queue Processing
 
-1. Actions queued with timestamp
-2. Processed in FIFO order when online
-3. Retry 3 times with exponential backoff
-4. Failed actions marked for manual retry
+1. Actions queued with `PendingAction` model
+2. Processed FIFO when online
+3. Retry 3 times with exponential backoff (1s, 2s, 4s)
+4. Failed actions shown in UI for manual retry
+5. Queue processed on: app launch, network restore, manual trigger
 
 ---
 
-## 7. Push Notifications
+## 10. Security Architecture
 
-### 7.1 APNs Setup
+### 10.1 Token Storage
 
-```swift
-// App/AppDelegate.swift
-import UserNotifications
-
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-
-    func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    ) -> Bool {
-        UNUserNotificationCenter.current().delegate = self
-        registerForPushNotifications()
-        return true
-    }
-
-    func registerForPushNotifications() {
-        UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .badge, .sound]
-        ) { granted, error in
-            guard granted else { return }
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
-        }
-    }
-
-    func application(
-        _ application: UIApplication,
-        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
-    ) {
-        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        Task {
-            try? await APIClient.shared.registerDeviceToken(token)
-        }
-    }
-
-    // Handle silent push (trigger sync)
-    func application(
-        _ application: UIApplication,
-        didReceiveRemoteNotification userInfo: [AnyHashable: Any]
-    ) async -> UIBackgroundFetchResult {
-        try? await SyncEngine.shared.syncAll()
-        return .newData
-    }
-}
+```
+Keychain (encrypted)
+├── accessToken: JWT
+├── refreshToken: String
+└── deviceToken: APNs token
 ```
 
-### 7.2 Notification Types
+- All tokens in Keychain (never UserDefaults)
+- Keychain accessibility: `.whenUnlockedThisDeviceOnly`
+- Biometric protection option via `kSecAccessControlBiometryCurrentSet`
 
-| Type | Trigger | Action |
-|------|---------|--------|
-| `message` | New message | Open conversation |
-| `grade_posted` | Grade available | Open grades |
-| `attendance_alert` | Absence marked | Open attendance |
-| `announcement` | New announcement | Open announcements |
-| `assignment` | New assignment | Open assignments |
-
----
-
-## 8. Security
-
-### 8.1 Token Storage
-- JWT stored in Keychain
-- Biometric protection option
-- No tokens in UserDefaults
-
-### 8.2 API Security
+### 10.2 Network Security
 - All requests over HTTPS
-- Authorization header with JWT
-- Certificate pinning (production)
+- Certificate pinning in production (via `URLSessionDelegate`)
+- Authorization header with JWT on every request
+- No sensitive data in URL query parameters
 
-### 8.3 Data Security
+### 10.3 Data Security
 - SwiftData encrypted at rest (device encryption)
-- No sensitive data in logs
-- Secure input fields
+- No sensitive data in logs (`os_log` with `.private` for PII)
+- Secure input fields for passwords
+- Biometric auth flow for app unlock
 
 ---
 
-## 9. Testing Strategy
+## 11. Accessibility Architecture
 
-### 9.1 Unit Tests
-- ViewModels (80%+ coverage)
-- UseCases
-- Repositories (with mocks)
-- Network layer
+### 11.1 VoiceOver
+- Every interactive element has `.accessibilityLabel`
+- Grouped related elements with `.accessibilityElement(children: .combine)`
+- Custom actions with `.accessibilityAction`
+- Meaningful descriptions (not "button" or "image")
 
-### 9.2 Integration Tests
-- API integration
-- SwiftData operations
-- Sync engine
+### 11.2 Dynamic Type
+- All text uses system font styles (`.body`, `.title`, etc.)
+- `@ScaledMetric` for custom dimensions
+- Layouts adapt to larger text sizes
+- No text truncation at accessibility sizes
 
-### 9.3 UI Tests
-- Login flow
-- Navigation
-- Critical user journeys
-- Accessibility
+### 11.3 RTL Support
+- SwiftUI handles most RTL automatically
+- Directional icons flip with `.flipsForRightToLeftLayoutDirection(true)`
+- Arabic (RTL) is the default language
+- `@Environment(\.layoutDirection)` for explicit checks
+
+### 11.4 Touch Targets
+- Minimum 44x44pt for all interactive elements
+- Adequate spacing between tappable items
+- Clear visual feedback on tap
 
 ---
 
-## 10. Performance Targets
+## 12. Performance Targets
 
-| Metric | Target |
-|--------|--------|
-| App Launch | < 2 seconds |
-| Screen Transition | < 300ms |
-| API Response | < 1 second |
-| Memory Usage | < 100MB |
-| Battery Impact | < 5% per hour active |
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| App Launch (cold) | < 2 seconds | Time Profiler |
+| Screen Transition | < 300ms | Animation duration |
+| API Response Display | < 1 second | Network + render |
+| Memory Usage | < 100MB | Instruments |
+| Battery Impact | < 5% per hour active | Energy Diagnostics |
+| Scroll Frame Rate | 60 FPS | Core Animation |
+| SwiftData Query | < 50ms | Signpost logging |

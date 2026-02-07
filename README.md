@@ -4,7 +4,7 @@ Native iOS companion app for the Hogwarts school management platform.
 
 ## Tech Stack
 
-- **Swift 5.9+** / **SwiftUI** / **iOS 17+**
+- **Swift 6.0+** / **SwiftUI** / **iOS 18+**
 - **SwiftData** - Offline-first persistence
 - **MVVM + Clean Architecture** - Testable, scalable
 - **BMAD Method** - Agile AI-driven development
@@ -16,7 +16,7 @@ Native iOS companion app for the Hogwarts school management platform.
 open Hogwarts.xcodeproj
 
 # Or via command line
-xcodebuild -scheme Hogwarts -destination 'platform=iOS Simulator,name=iPhone 15'
+xcodebuild -scheme Hogwarts -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 ## Architecture
