@@ -4,6 +4,7 @@ import AuthenticationServices
 /// Authentication manager
 /// Mirrors: src/auth.ts + src/auth.config.ts
 @Observable
+@MainActor
 final class AuthManager {
     private let keychain = KeychainService()
     private let api = APIClient.shared
@@ -14,9 +15,12 @@ final class AuthManager {
     /// Current session
     var session: Session?
 
+    /// Current session state
+    var sessionState: SessionState = .unauthenticated
+
     /// Check if user is authenticated
     var isAuthenticated: Bool {
-        accessToken != nil && currentUser != nil
+        sessionState == .authenticated && currentUser != nil
     }
 
     /// Get access token from keychain
@@ -27,6 +31,24 @@ final class AuthManager {
     /// User role
     var role: UserRole {
         currentUser?.userRole ?? .user
+    }
+
+    init() {
+        Task { await wireUnauthorizedHandler() }
+    }
+
+    /// Wire up 401 handler on APIClient
+    private func wireUnauthorizedHandler() async {
+        await api.setOnUnauthorized { [weak self] in
+            await MainActor.run {
+                self?.handleUnauthorized()
+            }
+        }
+    }
+
+    /// Handle 401 response — sign out immediately
+    private func handleUnauthorized() {
+        signOut()
     }
 
     // MARK: - Sign In Methods
@@ -87,69 +109,80 @@ final class AuthManager {
 
         self.session = session
         self.currentUser = session.user
+        self.sessionState = .authenticated
     }
 
     /// Restore session on app launch
+    /// Validates cached token, refreshes if near expiry, clears if expired
     func restoreSession() async {
-        guard let token = accessToken else { return }
+        guard let token = accessToken else {
+            sessionState = .unauthenticated
+            return
+        }
 
+        // Decode JWT to check expiry
+        if let payload = TokenPayload.decode(from: token) {
+            if payload.isExpired {
+                // Token expired — try refresh
+                do {
+                    try await refreshToken()
+                    return
+                } catch {
+                    signOut()
+                    return
+                }
+            }
+
+            if payload.shouldRefresh() {
+                // Token near expiry — proactive refresh
+                try? await refreshToken()
+            }
+        }
+
+        // Token still valid — fetch session from server
         do {
             let session = try await api.get("/auth/session", as: Session.self)
             self.session = session
             self.currentUser = session.user
+            self.sessionState = .authenticated
         } catch {
-            // Token invalid, clear session
             signOut()
         }
     }
 
-    /// Sign out
+    /// Refresh the access token using the refresh token
+    func refreshToken() async throws {
+        guard let refresh = keychain.get(.refreshToken) else {
+            throw AuthError.refreshFailed
+        }
+
+        let request = RefreshTokenRequest(refreshToken: refresh)
+
+        do {
+            let session = try await api.post("/auth/refresh", body: request, as: Session.self)
+            try saveSession(session)
+        } catch {
+            throw AuthError.refreshFailed
+        }
+    }
+
+    /// Ensure token is fresh before an API call (proactive refresh)
+    func ensureFreshToken() async {
+        guard let token = accessToken,
+              let payload = TokenPayload.decode(from: token),
+              payload.shouldRefresh() else {
+            return
+        }
+
+        try? await refreshToken()
+    }
+
+    /// Sign out — clear all auth state
     func signOut() {
         keychain.delete(.accessToken)
         keychain.delete(.refreshToken)
         currentUser = nil
         session = nil
-    }
-}
-
-// MARK: - Request/Response Types
-
-struct SignInRequest: Encodable {
-    let email: String
-    let password: String
-}
-
-struct OAuthSignInRequest: Encodable {
-    let provider: String
-    let token: String
-}
-
-struct Session: Codable {
-    let user: User
-    let schoolId: String?
-    let accessToken: String
-    let refreshToken: String?
-    let expiresAt: Date?
-}
-
-// MARK: - Errors
-
-enum AuthError: LocalizedError {
-    case invalidCredentials
-    case unauthorized
-    case sessionExpired
-    case networkError(Error)
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidCredentials:
-            return String(localized: "auth.error.invalidCredentials")
-        case .unauthorized:
-            return String(localized: "auth.error.unauthorized")
-        case .sessionExpired:
-            return String(localized: "auth.error.sessionExpired")
-        case .networkError(let error):
-            return error.localizedDescription
-        }
+        sessionState = .unauthenticated
     }
 }

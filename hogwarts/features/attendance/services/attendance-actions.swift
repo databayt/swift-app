@@ -4,7 +4,7 @@ import Foundation
 /// Mirrors: src/components/platform/attendance/actions.ts
 ///
 /// CRITICAL: All actions must include schoolId for multi-tenant isolation
-final class AttendanceActions {
+final class AttendanceActions: Sendable {
 
     private let api = APIClient.shared
     private let syncEngine = SyncEngine.shared

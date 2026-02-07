@@ -1,63 +1,6 @@
 import Foundation
 import SwiftData
 
-// MARK: - Attendance Model
-
-/// Attendance model
-/// Mirrors: prisma/models/attendance.prisma
-@Model
-final class AttendanceModel {
-    @Attribute(.unique) var id: String
-    var studentId: String
-    var classId: String?
-    var date: Date
-    var status: String
-    var method: String?
-    var schoolId: String
-    var notes: String?
-
-    var student: StudentModel?
-
-    var lastSyncedAt: Date?
-    var isLocalOnly: Bool = false
-
-    var attendanceStatus: AttendanceStatus {
-        AttendanceStatus(rawValue: status) ?? .present
-    }
-
-    init(
-        id: String,
-        studentId: String,
-        date: Date,
-        status: AttendanceStatus,
-        schoolId: String
-    ) {
-        self.id = id
-        self.studentId = studentId
-        self.date = date
-        self.status = status.rawValue
-        self.schoolId = schoolId
-    }
-}
-
-enum AttendanceStatus: String, Codable, CaseIterable {
-    case present = "PRESENT"
-    case absent = "ABSENT"
-    case late = "LATE"
-    case excused = "EXCUSED"
-    case sick = "SICK"
-
-    var displayName: String {
-        switch self {
-        case .present: return String(localized: "attendance.status.present")
-        case .absent: return String(localized: "attendance.status.absent")
-        case .late: return String(localized: "attendance.status.late")
-        case .excused: return String(localized: "attendance.status.excused")
-        case .sick: return String(localized: "attendance.status.sick")
-        }
-    }
-}
-
 // MARK: - Exam Result Model
 
 /// Exam result model

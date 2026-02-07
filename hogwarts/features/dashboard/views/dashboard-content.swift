@@ -167,7 +167,7 @@ struct DashboardCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: systemImage)
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 Text(title)
                     .font(.headline)
                 Spacer()

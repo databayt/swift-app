@@ -33,6 +33,9 @@ struct ContentView: View {
                 LoginView()
             }
         }
+        .task {
+            await authManager.restoreSession()
+        }
     }
 }
 

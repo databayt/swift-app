@@ -316,7 +316,7 @@ struct QRCodeScannerRepresentable: UIViewControllerRepresentable {
 
 // MARK: - QR Scanner View Controller
 
-class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
+class QRScannerViewController: UIViewController, @preconcurrency AVCaptureMetadataOutputObjectsDelegate {
     var onCodeScanned: ((String) -> Void)?
 
     private var captureSession: AVCaptureSession?
@@ -480,10 +480,10 @@ struct QRGeneratorView: View {
 
     private func generateQRCode(from string: String) -> UIImage? {
         let context = CIContext()
-        let filter = CIFilter.qrCodeGenerator()
+        guard let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
 
-        filter.message = Data(string.utf8)
-        filter.correctionLevel = "M"
+        filter.setValue(Data(string.utf8), forKey: "inputMessage")
+        filter.setValue("M", forKey: "inputCorrectionLevel")
 
         guard let outputImage = filter.outputImage else { return nil }
 

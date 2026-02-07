@@ -9,6 +9,12 @@ actor APIClient {
     private let baseURL: URL
     private let keychain = KeychainService()
 
+    /// Called when a 401 response is received
+    private var onUnauthorized: (@Sendable () async -> Void)?
+
+    /// Dynamic authorization token provider (injected by AuthManager)
+    private var authorizationProvider: (@Sendable () -> String?)?
+
     private init() {
         self.baseURL = URL(string: "https://ed.databayt.org/api")!
 
@@ -16,6 +22,16 @@ actor APIClient {
         config.timeoutIntervalForRequest = 30
         config.timeoutIntervalForResource = 60
         self.session = URLSession(configuration: config)
+    }
+
+    /// Set callback for 401 responses
+    func setOnUnauthorized(_ handler: @escaping @Sendable () async -> Void) {
+        self.onUnauthorized = handler
+    }
+
+    /// Set dynamic token provider (AuthManager injects this for proactive refresh)
+    func setAuthorizationProvider(_ provider: @escaping @Sendable () -> String?) {
+        self.authorizationProvider = provider
     }
 
     // MARK: - HTTP Methods
@@ -77,8 +93,8 @@ actor APIClient {
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        // Add auth header
-        if let token = keychain.get(.accessToken) {
+        // Add auth header (prefer dynamic provider, fallback to keychain)
+        if let token = authorizationProvider?() ?? keychain.get(.accessToken) {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 
@@ -100,6 +116,7 @@ actor APIClient {
             return try decoder.decode(T.self, from: data)
 
         case 401:
+            await onUnauthorized?()
             throw APIError.unauthorized
 
         case 403:

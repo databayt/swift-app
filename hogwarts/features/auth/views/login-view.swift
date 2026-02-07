@@ -21,7 +21,7 @@ struct LoginView: View {
                     VStack(spacing: 16) {
                         Image(systemName: "building.columns.fill")
                             .font(.system(size: 60))
-                            .foregroundStyle(.accentColor)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("Hogwarts")
                             .font(.largeTitle)
@@ -61,7 +61,7 @@ struct LoginView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(.accent)
+                        .background(Color.accentColor)
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .disabled(isLoading || email.isEmpty || password.isEmpty)

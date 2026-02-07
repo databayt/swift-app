@@ -582,6 +582,30 @@
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "هذا الحقل مطلوب" } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "This field is required" } }
       }
+    },
+    "session_expired" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Session expired, please sign in again" } }
+      }
+    },
+    "signing_out" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جاري تسجيل الخروج..." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Signing out..." } }
+      }
+    },
+    "session_restored" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "أهلاً بعودتك" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Welcome back" } }
+      }
+    },
+    "auth.error.refreshFailed" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فشل تحديث الجلسة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to refresh session" } }
+      }
     }
   },
   "version" : "1.0"

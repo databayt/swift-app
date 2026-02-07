@@ -16,7 +16,7 @@ actor SyncEngine {
     /// Full sync on app launch
     func syncAll() async {
         guard !isSyncing else { return }
-        guard networkMonitor.isConnected else { return }
+        guard networkMonitor.isOnline else { return }
 
         isSyncing = true
         defer { isSyncing = false }
@@ -41,7 +41,7 @@ actor SyncEngine {
 
     /// Sync specific entity type
     func sync(_ entityType: EntityType) async {
-        guard networkMonitor.isConnected else { return }
+        guard networkMonitor.isOnline else { return }
 
         switch entityType {
         case .students:
@@ -75,7 +75,7 @@ actor SyncEngine {
         try? context.save()
 
         // Try to sync immediately if online
-        if networkMonitor.isConnected {
+        if networkMonitor.isOnline {
             Task {
                 await processPendingActions()
             }
@@ -108,8 +108,13 @@ actor SyncEngine {
         action.status = SyncStatus.syncing.rawValue
         try? context.save()
 
+        // Extract data before crossing actor boundary
+        let endpoint = action.endpoint
+        let method = action.method
+        let payload = action.payload
+
         do {
-            try await executeAction(action)
+            try await executeAction(endpoint: endpoint, method: method, payload: payload)
             action.status = SyncStatus.completed.rawValue
         } catch {
             action.status = SyncStatus.failed.rawValue
@@ -120,20 +125,20 @@ actor SyncEngine {
         try? context.save()
     }
 
-    private func executeAction(_ action: PendingAction) async throws {
-        let method = HTTPMethod(rawValue: action.method) ?? .post
+    private func executeAction(endpoint: String, method: String, payload: Data?) async throws {
+        let httpMethod = HTTPMethod(rawValue: method) ?? .post
 
-        switch method {
+        switch httpMethod {
         case .post:
-            if let payload = action.payload {
-                let _: EmptyResponse = try await api.post(action.endpoint, body: payload)
+            if let payload {
+                let _: EmptyResponse = try await api.post(endpoint, body: payload)
             }
         case .put:
-            if let payload = action.payload {
-                let _: EmptyResponse = try await api.put(action.endpoint, body: payload)
+            if let payload {
+                let _: EmptyResponse = try await api.put(endpoint, body: payload)
             }
         case .delete:
-            try await api.delete(action.endpoint)
+            try await api.delete(endpoint)
         default:
             break
         }

@@ -55,19 +55,28 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     // MARK: - UNUserNotificationCenterDelegate
 
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         return [.banner, .badge, .sound]
     }
 
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
-        let userInfo = response.notification.request.content.userInfo
-        handleNotificationTap(userInfo)
+        let type = response.notification.request.content.userInfo["type"] as? String
+        let id = response.notification.request.content.userInfo["id"] as? String
+        if let type {
+            await MainActor.run {
+                NotificationCenter.default.post(
+                    name: .didReceiveNotification,
+                    object: nil,
+                    userInfo: ["type": type, "id": id as Any]
+                )
+            }
+        }
     }
 
     private func handleNotificationTap(_ userInfo: [AnyHashable: Any]) {

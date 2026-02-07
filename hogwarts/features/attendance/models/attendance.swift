@@ -17,6 +17,9 @@ final class AttendanceModel {
     var markedById: String?
     var markedAt: Date?
 
+    // Relationships
+    var student: StudentModel?
+
     // Sync metadata
     var lastSyncedAt: Date?
     var isLocalOnly: Bool = false

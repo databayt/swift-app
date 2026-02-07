@@ -122,7 +122,7 @@ struct LanguageSettingsView: View {
                     Spacer()
                     if selectedLanguage == "ar" {
                         Image(systemName: "checkmark")
-                            .foregroundStyle(.accentColor)
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
             }
@@ -136,7 +136,7 @@ struct LanguageSettingsView: View {
                     Spacer()
                     if selectedLanguage == "en" {
                         Image(systemName: "checkmark")
-                            .foregroundStyle(.accentColor)
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
             }
