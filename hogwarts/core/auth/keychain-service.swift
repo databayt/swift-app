@@ -9,6 +9,7 @@ final class KeychainService {
         case accessToken = "com.hogwarts.accessToken"
         case refreshToken = "com.hogwarts.refreshToken"
         case deviceToken = "com.hogwarts.deviceToken"
+        case lastSchoolId = "com.hogwarts.lastSchoolId"
     }
 
     private let serviceName = "com.hogwarts.ios"

@@ -24,17 +24,36 @@ struct HogwartsApp: App {
 /// Mirrors: src/app/[lang]/layout.tsx
 struct ContentView: View {
     @Environment(AuthManager.self) private var authManager
+    @Environment(TenantContext.self) private var tenantContext
 
     var body: some View {
         Group {
             if authManager.isAuthenticated {
-                MainTabView()
+                if tenantContext.isValid {
+                    MainTabView()
+                } else {
+                    SchoolSelectionView()
+                }
             } else {
                 LoginView()
             }
         }
         .task {
             await authManager.restoreSession()
+            restoreLastSchool()
+        }
+    }
+
+    /// Restore last selected school from keychain on session restore
+    private func restoreLastSchool() {
+        if authManager.isAuthenticated,
+           let lastSchoolId = KeychainService().get(.lastSchoolId),
+           let sessionSchoolId = authManager.session?.schoolId,
+           lastSchoolId == sessionSchoolId {
+            tenantContext.setTenant(schoolId: lastSchoolId)
+        } else if authManager.isAuthenticated,
+                  let schoolId = authManager.session?.schoolId {
+            tenantContext.setTenant(schoolId: schoolId)
         }
     }
 }

@@ -1,5 +1,7 @@
 import SwiftUI
 import AuthenticationServices
+import GoogleSignIn
+import FacebookLogin
 
 /// Login view
 /// Mirrors: src/app/[lang]/(auth)/login/page.tsx
@@ -7,11 +9,12 @@ struct LoginView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(TenantContext.self) private var tenantContext
 
-    @State private var email = ""
-    @State private var password = ""
-    @State private var isLoading = false
-    @State private var error: Error?
-    @State private var showError = false
+    @State private var viewModel = LoginViewModel()
+    @FocusState private var focusedField: LoginField?
+
+    enum LoginField {
+        case email, password
+    }
 
     var body: some View {
         NavigationStack {
@@ -36,23 +39,47 @@ struct LoginView: View {
                     // Login form
                     VStack(spacing: 16) {
                         // Email field
-                        TextField(String(localized: "login.email"), text: $email)
-                            .textFieldStyle(.roundedBorder)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
+                        VStack(alignment: .leading, spacing: 4) {
+                            TextField(String(localized: "login.email"), text: $viewModel.email)
+                                .textFieldStyle(.roundedBorder)
+                                .textContentType(.emailAddress)
+                                .keyboardType(.emailAddress)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                                .focused($focusedField, equals: .email)
+                                .submitLabel(.next)
+                                .onSubmit { focusedField = .password }
+                                .onChange(of: viewModel.email) { viewModel.onEmailChanged() }
+
+                            if let emailError = viewModel.emailError {
+                                Text(emailError)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                            }
+                        }
 
                         // Password field
-                        SecureField(String(localized: "login.password"), text: $password)
-                            .textFieldStyle(.roundedBorder)
-                            .textContentType(.password)
+                        VStack(alignment: .leading, spacing: 4) {
+                            SecureField(String(localized: "login.password"), text: $viewModel.password)
+                                .textFieldStyle(.roundedBorder)
+                                .textContentType(.password)
+                                .focused($focusedField, equals: .password)
+                                .submitLabel(.go)
+                                .onSubmit { submitForm() }
+                                .onChange(of: viewModel.password) { viewModel.onPasswordChanged() }
+
+                            if let passwordError = viewModel.passwordError {
+                                Text(passwordError)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                            }
+                        }
 
                         // Login button
                         Button {
-                            login()
+                            submitForm()
                         } label: {
-                            if isLoading {
+                            if viewModel.isLoading {
                                 ProgressView()
                                     .tint(.white)
                             } else {
@@ -61,10 +88,10 @@ struct LoginView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.accentColor)
+                        .background(viewModel.canSubmit ? Color.accentColor : Color.accentColor.opacity(0.5))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .disabled(isLoading || email.isEmpty || password.isEmpty)
+                        .disabled(!viewModel.canSubmit)
                     }
                     .padding(.horizontal)
 
@@ -97,6 +124,23 @@ struct LoginView: View {
                             .background(.secondary.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
+                        .disabled(viewModel.isLoading)
+
+                        // Facebook Sign In
+                        Button {
+                            signInWithFacebook()
+                        } label: {
+                            HStack {
+                                Image(systemName: "f.square.fill")
+                                Text(String(localized: "login.continueWithFacebook"))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(red: 0.23, green: 0.35, blue: 0.60))
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .disabled(viewModel.isLoading)
 
                         // Apple Sign In
                         SignInWithAppleButton(.signIn) { request in
@@ -115,8 +159,8 @@ struct LoginView: View {
             }
             .alert(
                 String(localized: "error.title"),
-                isPresented: $showError,
-                presenting: error
+                isPresented: $viewModel.showError,
+                presenting: viewModel.error
             ) { _ in
                 Button(String(localized: "common.ok")) {}
             } message: { error in
@@ -127,27 +171,92 @@ struct LoginView: View {
 
     // MARK: - Methods
 
-    private func login() {
-        isLoading = true
-
+    private func submitForm() {
+        focusedField = nil
         Task {
-            do {
-                let session = try await authManager.signIn(email: email, password: password)
-                if let schoolId = session.schoolId {
-                    tenantContext.setTenant(schoolId: schoolId)
-                }
-            } catch {
-                self.error = error
-                showError = true
-            }
-
-            isLoading = false
+            await viewModel.login(authManager: authManager, tenantContext: tenantContext)
         }
     }
 
     private func signInWithGoogle() {
-        // Implement Google Sign-In
-        // This requires GoogleSignIn SDK setup
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else { return }
+
+        viewModel.isLoading = true
+
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootVC) { result, error in
+            // Extract token on callback thread before crossing actor boundary
+            let idToken = result?.user.idToken?.tokenString
+            let callbackError = error
+
+            Task { @MainActor [viewModel, authManager, tenantContext] in
+                if let callbackError {
+                    viewModel.isLoading = false
+                    if (callbackError as NSError).code == GIDSignInError.canceled.rawValue { return }
+                    viewModel.error = callbackError
+                    viewModel.showError = true
+                    return
+                }
+
+                guard let idToken else {
+                    viewModel.isLoading = false
+                    viewModel.error = AuthError.invalidCredentials
+                    viewModel.showError = true
+                    return
+                }
+
+                do {
+                    let session = try await authManager.signInWithGoogle(idToken: idToken)
+                    if let schoolId = session.schoolId {
+                        tenantContext.setTenant(schoolId: schoolId)
+                    }
+                } catch {
+                    viewModel.error = error
+                    viewModel.showError = true
+                }
+                viewModel.isLoading = false
+            }
+        }
+    }
+
+    private func signInWithFacebook() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else { return }
+
+        viewModel.isLoading = true
+
+        let loginManager = LoginManager()
+        loginManager.logIn(permissions: ["email", "public_profile"], from: rootVC) { result, error in
+            // Extract token on callback thread before crossing actor boundary
+            let isCancelled = result?.isCancelled ?? true
+            let token = AccessToken.current?.tokenString
+            let callbackError = error
+
+            Task { @MainActor [viewModel, authManager, tenantContext] in
+                if let callbackError {
+                    viewModel.isLoading = false
+                    viewModel.error = callbackError
+                    viewModel.showError = true
+                    return
+                }
+
+                guard !isCancelled, let token else {
+                    viewModel.isLoading = false
+                    return
+                }
+
+                do {
+                    let session = try await authManager.signInWithFacebook(accessToken: token)
+                    if let schoolId = session.schoolId {
+                        tenantContext.setTenant(schoolId: schoolId)
+                    }
+                } catch {
+                    viewModel.error = error
+                    viewModel.showError = true
+                }
+                viewModel.isLoading = false
+            }
+        }
     }
 
     private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
@@ -160,13 +269,13 @@ struct LoginView: View {
                         tenantContext.setTenant(schoolId: schoolId)
                     }
                 } catch {
-                    self.error = error
-                    showError = true
+                    viewModel.error = error
+                    viewModel.showError = true
                 }
             }
         case .failure(let error):
-            self.error = error
-            showError = true
+            viewModel.error = error
+            viewModel.showError = true
         }
     }
 }

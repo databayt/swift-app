@@ -59,11 +59,11 @@ struct DashboardContent: View {
     private var roleSpecificContent: some View {
         switch authManager.role {
         case .student:
-            StudentDashboardContent()
+            StudentDashboard()
         case .teacher:
-            TeacherDashboardContent()
+            TeacherDashboard()
         case .guardian:
-            GuardianDashboardContent()
+            GuardianDashboard()
         case .admin, .developer:
             AdminDashboardContent()
         default:
@@ -72,70 +72,7 @@ struct DashboardContent: View {
     }
 }
 
-// MARK: - Role-Specific Views
-
-struct StudentDashboardContent: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            // Today's schedule
-            DashboardCard(
-                title: String(localized: "dashboard.todaySchedule"),
-                systemImage: "calendar"
-            ) {
-                Text("Schedule content")
-            }
-
-            // Recent grades
-            DashboardCard(
-                title: String(localized: "dashboard.recentGrades"),
-                systemImage: "chart.bar"
-            ) {
-                Text("Grades content")
-            }
-
-            // Attendance summary
-            DashboardCard(
-                title: String(localized: "dashboard.attendance"),
-                systemImage: "checkmark.circle"
-            ) {
-                Text("Attendance content")
-            }
-        }
-    }
-}
-
-struct TeacherDashboardContent: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            DashboardCard(
-                title: String(localized: "dashboard.todayClasses"),
-                systemImage: "person.3"
-            ) {
-                Text("Classes content")
-            }
-
-            DashboardCard(
-                title: String(localized: "dashboard.pendingGrades"),
-                systemImage: "pencil.and.list.clipboard"
-            ) {
-                Text("Pending grades")
-            }
-        }
-    }
-}
-
-struct GuardianDashboardContent: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            DashboardCard(
-                title: String(localized: "dashboard.children"),
-                systemImage: "person.2"
-            ) {
-                Text("Children overview")
-            }
-        }
-    }
-}
+// MARK: - Placeholder Views (Admin/Default — Sprint 2)
 
 struct AdminDashboardContent: View {
     var body: some View {

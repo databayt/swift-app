@@ -1,8 +1,10 @@
 import UIKit
 import UserNotifications
+import GoogleSignIn
+import FacebookCore
 
-/// App delegate for push notifications
-/// Handles APNs registration and notification delivery
+/// App delegate for push notifications and OAuth URL handling
+/// Handles APNs registration, notification delivery, and OAuth callbacks
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
     func application(
@@ -11,7 +13,31 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         registerForPushNotifications()
+
+        // Initialize Facebook SDK
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+
         return true
+    }
+
+    // MARK: - URL Handling (OAuth Callbacks)
+
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+    ) -> Bool {
+        // Google Sign-In
+        if GIDSignIn.sharedInstance.handle(url) {
+            return true
+        }
+
+        // Facebook Login
+        if ApplicationDelegate.shared.application(app, open: url, options: options) {
+            return true
+        }
+
+        return false
     }
 
     // MARK: - Push Notifications
@@ -77,17 +103,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 )
             }
         }
-    }
-
-    private func handleNotificationTap(_ userInfo: [AnyHashable: Any]) {
-        guard let type = userInfo["type"] as? String else { return }
-
-        // Handle navigation based on notification type
-        NotificationCenter.default.post(
-            name: .didReceiveNotification,
-            object: nil,
-            userInfo: ["type": type, "data": userInfo]
-        )
     }
 }
 

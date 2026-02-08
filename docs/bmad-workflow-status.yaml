@@ -106,26 +106,26 @@ epics:
     name: Authentication
     priority: P0
     sprint: 1
-    status: in_progress
+    status: complete
     stories:
       - id: AUTH-001
         title: Google OAuth Sign-In
-        status: pending
+        status: complete
         priority: P0
         story_file: docs/stories/AUTH-001-google-oauth.md
       - id: AUTH-002
         title: Facebook OAuth Sign-In
-        status: pending
+        status: complete
         priority: P0
         story_file: docs/stories/AUTH-002-facebook-oauth.md
       - id: AUTH-003
         title: Email/Password Login
-        status: pending
+        status: complete
         priority: P0
         story_file: docs/stories/AUTH-003-email-password.md
       - id: AUTH-004
         title: School Selection
-        status: pending
+        status: complete
         priority: P0
         story_file: docs/stories/AUTH-004-school-selection.md
       - id: AUTH-005
@@ -143,21 +143,21 @@ epics:
     name: Dashboard
     priority: P0
     sprint: 1-2
-    status: pending
+    status: in_progress
     stories:
       - id: DASH-001
         title: Student Dashboard
-        status: pending
+        status: complete
         priority: P0
         story_file: docs/stories/DASH-001-student-dashboard.md
       - id: DASH-002
         title: Teacher Dashboard
-        status: pending
+        status: complete
         priority: P0
         story_file: docs/stories/DASH-002-teacher-dashboard.md
       - id: DASH-003
         title: Guardian Dashboard
-        status: pending
+        status: complete
         priority: P0
         story_file: docs/stories/DASH-003-guardian-dashboard.md
       - id: DASH-004

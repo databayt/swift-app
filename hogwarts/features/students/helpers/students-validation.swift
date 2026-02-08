@@ -181,7 +181,7 @@ struct StudentsValidation {
 
 // MARK: - Validation Types
 
-enum ValidationResult {
+enum ValidationResult: Equatable {
     case valid
     case invalid(String)
 

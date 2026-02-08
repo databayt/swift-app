@@ -606,6 +606,246 @@
         "ar" : { "stringUnit" : { "state" : "translated", "value" : "فشل تحديث الجلسة" } },
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Failed to refresh session" } }
       }
+    },
+    "auth.error.invalidCredentials" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "بيانات الدخول غير صحيحة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Invalid credentials" } }
+      }
+    },
+    "auth.error.unauthorized" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غير مصرح بالدخول" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unauthorized access" } }
+      }
+    },
+    "auth.error.accountNotFound" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الحساب غير موجود" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Account not found" } }
+      }
+    },
+    "auth.error.cancelled" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم إلغاء تسجيل الدخول" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sign in was cancelled" } }
+      }
+    },
+    "auth.error.invalidEmail" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "البريد الإلكتروني غير صالح" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Invalid email address" } }
+      }
+    },
+    "auth.error.emptyPassword" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "كلمة المرور مطلوبة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Password is required" } }
+      }
+    },
+    "auth.error.networkError" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "خطأ في الشبكة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Network error" } }
+      }
+    },
+    "login.continueWithFacebook" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "المتابعة مع Facebook" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Continue with Facebook" } }
+      }
+    },
+    "school.selection.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختر المدرسة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select School" } }
+      }
+    },
+    "school.selection.subtitle" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختر المدرسة التي تريد الدخول إليها" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose which school to access" } }
+      }
+    },
+    "school.selection.noSchool" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد مدرسة مرتبطة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No school assigned" } }
+      }
+    },
+    "school.selection.noSchoolMessage" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لم يتم ربط حسابك بأي مدرسة. تواصل مع الإدارة." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your account is not linked to any school. Contact administration." } }
+      }
+    },
+    "school.selection.lastUsed" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "آخر استخدام" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Last used" } }
+      }
+    },
+    "dashboard.title" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لوحة المعلومات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Dashboard" } }
+      }
+    },
+    "dashboard.welcome" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مرحباً" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Welcome" } }
+      }
+    },
+    "dashboard.todaySchedule" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "جدول اليوم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Today's Schedule" } }
+      }
+    },
+    "dashboard.recentGrades" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الدرجات الأخيرة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recent Grades" } }
+      }
+    },
+    "dashboard.attendance" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Attendance" } }
+      }
+    },
+    "dashboard.todayClasses" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حصص اليوم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Today's Classes" } }
+      }
+    },
+    "dashboard.pendingGrades" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "درجات معلقة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pending Grades" } }
+      }
+    },
+    "dashboard.pendingAttendance" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حضور معلق" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pending Attendance" } }
+      }
+    },
+    "dashboard.children" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الأبناء" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Children" } }
+      }
+    },
+    "dashboard.schoolOverview" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نظرة عامة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "School Overview" } }
+      }
+    },
+    "dashboard.noClasses" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد حصص اليوم" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No classes today" } }
+      }
+    },
+    "dashboard.noGrades" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد درجات حديثة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No recent grades" } }
+      }
+    },
+    "dashboard.attendanceRate" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "نسبة الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Attendance Rate" } }
+      }
+    },
+    "dashboard.present" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "حاضر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Present" } }
+      }
+    },
+    "dashboard.absent" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "غائب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Absent" } }
+      }
+    },
+    "dashboard.late" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "متأخر" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Late" } }
+      }
+    },
+    "dashboard.quickActions" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إجراءات سريعة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quick Actions" } }
+      }
+    },
+    "dashboard.takeAttendance" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Take Attendance" } }
+      }
+    },
+    "dashboard.enterGrades" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إدخال الدرجات" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Enter Grades" } }
+      }
+    },
+    "dashboard.messages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرسائل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Messages" } }
+      }
+    },
+    "dashboard.allAttendanceMarked" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم تسجيل جميع الحضور" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All attendance marked" } }
+      }
+    },
+    "dashboard.markAttendance" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تسجيل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark" } }
+      }
+    },
+    "dashboard.studentsCount" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "%d طالب" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%d students" } }
+      }
+    },
+    "dashboard.currentClass" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الحصة الحالية" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Current" } }
+      }
+    },
+    "dashboard.recentMessages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الرسائل الأخيرة" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recent Messages" } }
+      }
+    },
+    "dashboard.noMessages" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لا توجد رسائل" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No messages" } }
+      }
+    },
+    "dashboard.lastUpdated" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "آخر تحديث: %@" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Last updated: %@" } }
+      }
     }
   },
   "version" : "1.0"
