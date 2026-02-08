@@ -23,6 +23,8 @@ struct TimetableDayView: View {
                         ) {
                             viewModel.selectDay(day)
                         }
+                        .accessibilityLabel(String(localized: "a11y.timetable.daySelector \(day.shortName)"))
+                        .accessibilityHint(viewModel.selectedDay == day ? String(localized: "a11y.timetable.daySelected") : String(localized: "a11y.timetable.dayTapToSelect"))
                     }
                 }
                 .padding(.horizontal)
@@ -38,6 +40,7 @@ struct TimetableDayView: View {
                     Image(systemName: "calendar.badge.minus")
                         .font(.largeTitle)
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                     Text(String(localized: "timetable.noClasses"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -89,6 +92,7 @@ struct DaySelectorChip: View {
                     Circle()
                         .fill(.blue)
                         .frame(width: 6, height: 6)
+                        .accessibilityHidden(true)
                 }
             }
             .padding(.horizontal, 16)
@@ -119,12 +123,15 @@ struct DayTimelineRow: View {
                     .foregroundStyle(.secondary)
             }
             .frame(width: 50)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "a11y.timetable.timeRange \(entry.startTime) \(entry.endTime)"))
 
             // Period indicator
             Circle()
                 .fill(.blue)
                 .frame(width: 10, height: 10)
                 .padding(.top, 4)
+                .accessibilityHidden(true)
 
             // Entry card
             VStack(alignment: .leading, spacing: 6) {
@@ -156,6 +163,7 @@ struct DayTimelineRow: View {
             .background(.quaternary)
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -174,5 +182,6 @@ struct TimelineConnector: View {
 
             Spacer()
         }
+        .accessibilityHidden(true)
     }
 }

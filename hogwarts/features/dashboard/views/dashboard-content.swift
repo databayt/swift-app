@@ -33,7 +33,7 @@ struct DashboardContent: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                Text(authManager.currentUser?.displayName ?? "User")
+                Text(authManager.currentUser?.displayName ?? String(localized: "profile.defaultName"))
                     .font(.title2)
                     .fontWeight(.bold)
             }
@@ -49,10 +49,12 @@ struct DashboardContent: View {
             }
             .frame(width: 50, height: 50)
             .clipShape(Circle())
+            .accessibilityHidden(true)
         }
         .padding()
         .background(.quaternary)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder
@@ -106,6 +108,7 @@ struct DashboardCard<Content: View>: View {
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
+        .accessibilityElement(children: .combine)
     }
 }
 

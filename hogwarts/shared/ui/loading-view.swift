@@ -10,6 +10,7 @@ struct LoadingView: View {
             ProgressView()
                 .progressViewStyle(.circular)
                 .scaleEffect(1.2)
+                .accessibilityLabel(String(localized: "a11y.loading"))
 
             if let message = message {
                 Text(message)

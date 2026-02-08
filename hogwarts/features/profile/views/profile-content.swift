@@ -26,9 +26,10 @@ struct ProfileContent: View {
                         }
                         .frame(width: 60, height: 60)
                         .clipShape(Circle())
+                        .accessibilityHidden(true)
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(authManager.currentUser?.displayName ?? "User")
+                            Text(authManager.currentUser?.displayName ?? String(localized: "profile.defaultName"))
                                 .font(.headline)
                             Text(authManager.currentUser?.email ?? "")
                                 .font(.subheadline)
@@ -40,9 +41,11 @@ struct ProfileContent: View {
                                 .background(.blue.opacity(0.2))
                                 .foregroundStyle(.blue)
                                 .clipShape(Capsule())
+                                .accessibilityLabel(String(localized: "a11y.profile.role \(authManager.role.displayName)"))
                         }
                     }
                     .padding(.vertical, 8)
+                    .accessibilityElement(children: .combine)
                 }
 
                 // Settings
@@ -83,22 +86,25 @@ struct ProfileContent: View {
                                 if appTheme == theme.rawValue {
                                     Image(systemName: "checkmark")
                                         .foregroundStyle(Color.accentColor)
+                                        .accessibilityHidden(true)
                                 }
                             }
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.theme \(theme.displayName)"))
+                        .accessibilityHint(appTheme == theme.rawValue ? String(localized: "a11y.profile.themeSelected") : String(localized: "a11y.profile.themeTapToSelect"))
                     }
                 }
 
                 // Support
                 Section(String(localized: "profile.support")) {
                     NavigationLink {
-                        Text("Help")
+                        Text(String(localized: "profile.help"))
                     } label: {
                         Label(String(localized: "profile.help"), systemImage: "questionmark.circle")
                     }
 
                     NavigationLink {
-                        Text("About")
+                        Text(String(localized: "profile.about"))
                     } label: {
                         Label(String(localized: "profile.about"), systemImage: "info.circle")
                     }
@@ -111,6 +117,7 @@ struct ProfileContent: View {
                     } label: {
                         Label(String(localized: "profile.logout"), systemImage: "rectangle.portrait.and.arrow.right")
                     }
+                    .accessibilityLabel(String(localized: "a11y.button.logout"))
                 }
             }
             .navigationTitle(String(localized: "profile.title"))
@@ -148,6 +155,8 @@ struct ProfileContent: View {
             )) {
                 Label(biometricService.biometricName, systemImage: biometricService.biometricIcon)
             }
+            .accessibilityLabel(String(localized: "a11y.profile.biometricToggle \(biometricService.biometricName)"))
+            .accessibilityHint(biometricService.isBiometricEnabled ? String(localized: "a11y.profile.biometricEnabled") : String(localized: "a11y.profile.biometricDisabled"))
         }
     }
 

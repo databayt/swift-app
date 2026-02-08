@@ -17,12 +17,14 @@ struct ClassDetailView: View {
                         String(localized: "timetable.className"),
                         value: classDetail.displayName
                     )
+                    .accessibilityElement(children: .combine)
 
                     if let subject = classDetail.displaySubject {
                         LabeledContent(
                             String(localized: "timetable.subject"),
                             value: subject
                         )
+                        .accessibilityElement(children: .combine)
                     }
 
                     if let teacher = classDetail.teacherName {
@@ -30,6 +32,7 @@ struct ClassDetailView: View {
                             String(localized: "timetable.teacher"),
                             value: teacher
                         )
+                        .accessibilityElement(children: .combine)
                     }
 
                     if let room = classDetail.room {
@@ -37,6 +40,7 @@ struct ClassDetailView: View {
                             String(localized: "timetable.room"),
                             value: room
                         )
+                        .accessibilityElement(children: .combine)
                     }
 
                     if let count = classDetail.studentCount {
@@ -44,6 +48,7 @@ struct ClassDetailView: View {
                             String(localized: "timetable.studentCount"),
                             value: "\(count)"
                         )
+                        .accessibilityElement(children: .combine)
                     }
                 }
 
@@ -62,6 +67,7 @@ struct ClassDetailView: View {
                                 }
                                 .frame(width: 36, height: 36)
                                 .clipShape(Circle())
+                                .accessibilityHidden(true)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(student.displayName)
@@ -74,6 +80,7 @@ struct ClassDetailView: View {
                                 }
                             }
                             .padding(.vertical, 2)
+                            .accessibilityElement(children: .combine)
                         }
                     }
                 }
@@ -85,6 +92,7 @@ struct ClassDetailView: View {
                     Button(String(localized: "common.done")) {
                         dismiss()
                     }
+                    .accessibilityLabel(String(localized: "a11y.button.done"))
                 }
             }
         }

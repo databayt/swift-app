@@ -145,6 +145,7 @@ struct ExcuseRow: View {
                     }
                     .buttonStyle(.bordered)
                     .tint(.green)
+                    .accessibilityLabel(String(localized: "a11y.button.approveExcuse"))
 
                     Button {
                         Task { await onReject() }
@@ -159,11 +160,13 @@ struct ExcuseRow: View {
                     }
                     .buttonStyle(.bordered)
                     .tint(.red)
+                    .accessibilityLabel(String(localized: "a11y.button.rejectExcuse"))
                 }
                 .padding(.top, 4)
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder
@@ -176,6 +179,7 @@ struct ExcuseRow: View {
             .background(statusColor.opacity(0.2))
             .foregroundStyle(statusColor)
             .clipShape(Capsule())
+            .accessibilityLabel(String(localized: "a11y.excuse.status \(excuse.status.displayName)"))
     }
 
     private var statusColor: Color {

@@ -34,6 +34,7 @@ struct GradesContent: View {
                         } label: {
                             Image(systemName: "plus")
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.createExam"))
                     }
                 }
 
@@ -44,6 +45,7 @@ struct GradesContent: View {
                         } label: {
                             Image(systemName: "doc.text")
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.viewReportCard"))
                     }
                 }
 
@@ -57,6 +59,7 @@ struct GradesContent: View {
                         } label: {
                             Image(systemName: "chart.bar")
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.viewGradeCharts"))
                     }
                 }
             }
@@ -116,6 +119,8 @@ struct TeacherGradesContent: View {
             }
             .pickerStyle(.segmented)
             .padding()
+            .accessibilityLabel(String(localized: "a11y.picker.gradeView"))
+            .accessibilityHint(String(localized: "a11y.hint.switchBetweenExamsAndResults"))
 
             if selectedTab == 0 {
                 // Exams list
@@ -210,6 +215,7 @@ struct StudentGradesContent: View {
                         isSelected: viewModel.filters.examType == nil,
                         action: { viewModel.filterByExamType(nil) }
                     )
+                    .accessibilityLabel(String(localized: "a11y.filter.allExamTypes"))
 
                     ForEach(ExamType.allCases, id: \.self) { type in
                         FilterChip(
@@ -217,10 +223,13 @@ struct StudentGradesContent: View {
                             isSelected: viewModel.filters.examType == type,
                             action: { viewModel.filterByExamType(type) }
                         )
+                        .accessibilityLabel(String(localized: "a11y.filter.examType \(type.displayName)"))
                     }
                 }
             }
             .padding()
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(String(localized: "a11y.label.examTypeFilters"))
 
             // Results
             Group {
@@ -261,6 +270,7 @@ struct NoAccessGradesContent: View {
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
                 .padding()
+                .accessibilityHidden(true)
             Text(String(localized: "grades.noAccess"))
                 .foregroundStyle(.secondary)
         }

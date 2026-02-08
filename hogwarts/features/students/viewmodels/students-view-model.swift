@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 
 /// ViewModel for Students list
 /// Mirrors: Logic from content.tsx + table.tsx
@@ -139,7 +140,7 @@ final class StudentsViewModel {
             yearLevels = try await actions.getYearLevels(schoolId: schoolId)
         } catch {
             // Year levels are non-critical, don't show error
-            print("Failed to load year levels: \(error)")
+            Logger.students.error("Failed to load year levels: \(error)")
         }
     }
 

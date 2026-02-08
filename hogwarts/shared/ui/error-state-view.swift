@@ -11,6 +11,7 @@ struct ErrorStateView: View {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 50))
                 .foregroundStyle(.red)
+                .accessibilityHidden(true)
 
             VStack(spacing: 8) {
                 Text(String(localized: "error.title"))
@@ -29,6 +30,7 @@ struct ErrorStateView: View {
                         .fontWeight(.semibold)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel(String(localized: "a11y.button.retry"))
             }
         }
         .padding()

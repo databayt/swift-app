@@ -13,6 +13,7 @@ struct GPASummaryCard: View {
                 label: String(localized: "grade.gpa"),
                 color: gpaColor
             )
+            .accessibilityLabel(String(localized: "a11y.label.gpa \(String(format: "%.2f", reportCard.gpa))"))
 
             Divider()
                 .frame(height: 40)
@@ -23,6 +24,7 @@ struct GPASummaryCard: View {
                 label: String(localized: "grade.average"),
                 color: averageColor
             )
+            .accessibilityLabel(String(localized: "a11y.label.overallAverage \(String(format: "%.0f", reportCard.overallAverage))"))
 
             Divider()
                 .frame(height: 40)
@@ -33,6 +35,7 @@ struct GPASummaryCard: View {
                 label: String(localized: "grade.letterGrade"),
                 color: averageColor
             )
+            .accessibilityLabel(String(localized: "a11y.label.letterGrade \(GradeCalculator.letterGrade(for: reportCard.overallAverage))"))
 
             // Rank (if available)
             if let rank = reportCard.rank, let total = reportCard.totalStudents {
@@ -44,11 +47,14 @@ struct GPASummaryCard: View {
                     label: String(localized: "grade.rank"),
                     color: .orange
                 )
+                .accessibilityLabel(String(localized: "a11y.label.rank \(rank) \(total)"))
             }
         }
         .padding()
         .background(.quaternary)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.label.gpaSummary \(String(format: "%.2f", reportCard.gpa)) \(String(format: "%.0f", reportCard.overallAverage)) \(GradeCalculator.letterGrade(for: reportCard.overallAverage))"))
     }
 
     @ViewBuilder

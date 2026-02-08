@@ -60,6 +60,7 @@ struct ChatView: View {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .font(.largeTitle)
                             .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                         Text(String(localized: "messages.startConversation"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
@@ -126,6 +127,8 @@ struct MessageInputBar: View {
             )
             .lineLimit(1...4)
             .textFieldStyle(.roundedBorder)
+            .accessibilityLabel(String(localized: "a11y.field.messageInput"))
+            .accessibilityHint(String(localized: "a11y.hint.typeYourMessage"))
 
             Button(action: onSend) {
                 Group {
@@ -140,6 +143,7 @@ struct MessageInputBar: View {
             }
             .disabled(!canSend)
             .tint(.blue)
+            .accessibilityLabel(String(localized: "a11y.button.sendMessage"))
         }
         .padding(.horizontal)
         .padding(.vertical, 8)

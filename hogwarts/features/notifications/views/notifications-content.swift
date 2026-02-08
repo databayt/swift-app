@@ -19,6 +19,7 @@ struct NotificationsContent: View {
                         ) {
                             viewModel.setFilter(.all)
                         }
+                        .accessibilityLabel(String(localized: "a11y.notification.filterAll"))
 
                         NotificationFilterChip(
                             filter: .unread,
@@ -27,6 +28,7 @@ struct NotificationsContent: View {
                         ) {
                             viewModel.setFilter(.unread)
                         }
+                        .accessibilityLabel(String(localized: "a11y.notification.filterUnread \(viewModel.unreadCount)"))
 
                         ForEach(NotificationType.allCases, id: \.self) { type in
                             NotificationFilterChip(
@@ -35,6 +37,7 @@ struct NotificationsContent: View {
                             ) {
                                 viewModel.setFilter(.type(type))
                             }
+                            .accessibilityLabel(String(localized: "a11y.notification.filterType \(type.label)"))
                         }
                     }
                     .padding(.horizontal)
@@ -129,6 +132,7 @@ struct NotificationsContent: View {
                         } label: {
                             Image(systemName: "envelope.open")
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.markAllRead"))
                     }
                 }
             }
@@ -183,6 +187,7 @@ struct NotificationFilterChip: View {
                         .padding(.vertical, 1)
                         .background(.red)
                         .clipShape(Capsule())
+                        .accessibilityLabel(String(localized: "a11y.notification.badgeCount \(badge)"))
                 }
             }
             .padding(.horizontal, 12)

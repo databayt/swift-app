@@ -9,6 +9,7 @@ struct ConversationRow: View {
         HStack(spacing: 12) {
             // Avatar
             conversationAvatar
+                .accessibilityHidden(true)
 
             // Content
             VStack(alignment: .leading, spacing: 4) {
@@ -55,11 +56,13 @@ struct ConversationRow: View {
                             .padding(.vertical, 2)
                             .background(.blue)
                             .clipShape(Capsule())
+                            .accessibilityLabel(String(localized: "a11y.label.unreadMessages \(conversation.unreadCount)"))
                     }
                 }
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder

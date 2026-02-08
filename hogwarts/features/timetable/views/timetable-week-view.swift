@@ -34,10 +34,12 @@ struct TimetableWeekView: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(day == DayOfWeek.today ? .blue : .primary)
                             .frame(maxWidth: .infinity)
+                            .accessibilityLabel(day == DayOfWeek.today ? String(localized: "a11y.timetable.todayColumn \(day.shortName)") : day.shortName)
                     }
                 }
                 .padding(.vertical, 8)
                 .background(.quaternary)
+                .accessibilityElement(children: .contain)
 
                 Divider()
 
@@ -50,6 +52,7 @@ struct TimetableWeekView: View {
                             .fontWeight(.medium)
                             .foregroundStyle(.secondary)
                             .frame(width: 40)
+                            .accessibilityLabel(String(localized: "a11y.timetable.periodNumber \(period)"))
 
                         // Day cells
                         ForEach(workingDays, id: \.self) { day in
@@ -111,9 +114,13 @@ struct WeekCellView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(isToday ? Color.blue.opacity(0.1) : Color.secondary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(entry.displayName + (entry.classroomName.map { ", \($0)" } ?? ""))
+                .accessibilityHint(String(localized: "a11y.timetable.tapForDetails"))
             } else {
                 Color.clear
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .accessibilityHidden(true)
             }
         }
         .padding(2)

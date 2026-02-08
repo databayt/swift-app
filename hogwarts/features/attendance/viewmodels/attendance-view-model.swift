@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 
 /// ViewModel for Attendance feature
 /// Mirrors: Logic from content.tsx + role-based views
@@ -146,7 +147,7 @@ final class AttendanceViewModel {
             stats = try await actions.getStats(studentId: studentId, schoolId: schoolId)
         } catch {
             // Stats are non-critical, don't show error
-            print("Failed to load stats: \(error)")
+            Logger.attendance.error("Failed to load stats: \(error)")
         }
     }
 
@@ -209,7 +210,7 @@ final class AttendanceViewModel {
             )
         } catch {
             // Non-critical — don't block UI
-            print("Failed to load student excuses: \(error)")
+            Logger.attendance.error("Failed to load student excuses: \(error)")
         }
     }
 
@@ -241,7 +242,7 @@ final class AttendanceViewModel {
                 selectedClassId = first.id
             }
         } catch {
-            print("Failed to load teacher classes: \(error)")
+            Logger.attendance.error("Failed to load teacher classes: \(error)")
         }
     }
 

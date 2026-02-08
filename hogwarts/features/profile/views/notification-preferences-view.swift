@@ -30,6 +30,8 @@ struct NotificationPreferencesView: View {
                         Label(type.label, systemImage: type.icon)
                     }
                     .disabled(isLoading)
+                    .accessibilityLabel(String(localized: "a11y.notification.toggle \(type.label)"))
+                    .accessibilityHint(String(localized: "a11y.notification.toggleHint \(type.label)"))
                 }
             }
         }
@@ -59,19 +61,23 @@ struct NotificationPreferencesView: View {
             case .authorized, .provisional:
                 Text(String(localized: "notification.prefs.enabled"))
                     .foregroundStyle(.green)
+                    .accessibilityLabel(String(localized: "a11y.notification.pushEnabled"))
             case .denied:
                 Button(String(localized: "notification.prefs.openSettings")) {
                     openSystemSettings()
                 }
                 .foregroundStyle(.blue)
+                .accessibilityLabel(String(localized: "a11y.button.openNotificationSettings"))
             case .notDetermined:
                 Button(String(localized: "notification.prefs.enable")) {
                     Task { await requestPushPermission() }
                 }
+                .accessibilityLabel(String(localized: "a11y.button.enablePushNotifications"))
             @unknown default:
                 EmptyView()
             }
         }
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Bindings

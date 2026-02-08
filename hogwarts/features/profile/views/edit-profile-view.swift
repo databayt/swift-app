@@ -25,6 +25,7 @@ struct EditProfileView: View {
                         }
                         .frame(width: 80, height: 80)
                         .clipShape(Circle())
+                        .accessibilityHidden(true)
 
                         PhotosPicker(
                             selection: $selectedPhoto,
@@ -33,6 +34,8 @@ struct EditProfileView: View {
                             Text(String(localized: "profile.edit.changePhoto"))
                                 .font(.subheadline)
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.changePhoto"))
+                        .accessibilityHint(String(localized: "a11y.profile.changePhotoHint"))
                     }
                     Spacer()
                 }
@@ -45,12 +48,16 @@ struct EditProfileView: View {
                     text: $viewModel.editName
                 )
                 .textContentType(.name)
+                .accessibilityLabel(String(localized: "profile.edit.name"))
+                .accessibilityHint(String(localized: "a11y.profile.editNameHint"))
 
                 TextField(
                     String(localized: "profile.edit.nameAr"),
                     text: $viewModel.editNameAr
                 )
                 .environment(\.layoutDirection, .rightToLeft)
+                .accessibilityLabel(String(localized: "profile.edit.nameAr"))
+                .accessibilityHint(String(localized: "a11y.profile.editNameArHint"))
             }
 
             // Contact
@@ -61,6 +68,8 @@ struct EditProfileView: View {
                 )
                 .textContentType(.telephoneNumber)
                 .keyboardType(.phonePad)
+                .accessibilityLabel(String(localized: "profile.edit.phone"))
+                .accessibilityHint(String(localized: "a11y.profile.editPhoneHint"))
 
                 // Email (read-only)
                 if let email = viewModel.currentUser?.email {
@@ -71,6 +80,7 @@ struct EditProfileView: View {
                         Text(email)
                             .foregroundStyle(.secondary)
                     }
+                    .accessibilityElement(children: .combine)
                 }
             }
         }
@@ -93,6 +103,8 @@ struct EditProfileView: View {
                     }
                 }
                 .disabled(viewModel.isSaving)
+                .accessibilityLabel(String(localized: "a11y.button.saveProfile"))
+                .accessibilityHint(viewModel.isSaving ? String(localized: "a11y.profile.saving") : String(localized: "a11y.profile.tapToSave"))
             }
         }
         .alert(

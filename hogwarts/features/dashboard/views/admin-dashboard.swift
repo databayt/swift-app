@@ -206,6 +206,7 @@ struct AdminDashboard: View {
                                 .foregroundStyle(.tertiary)
                         }
                         .padding(.vertical, 8)
+                        .accessibilityElement(children: .combine)
 
                         if item.id != viewModel.recentActivity.prefix(5).last?.id {
                             Divider()
@@ -266,6 +267,8 @@ struct StatCard: View {
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.05), radius: 6, y: 3)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title): \(value)")
     }
 }
 

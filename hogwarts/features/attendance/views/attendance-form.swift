@@ -42,6 +42,7 @@ struct AttendanceForm: View {
                     Button(String(localized: "common.cancel")) {
                         dismiss()
                     }
+                    .accessibilityLabel(String(localized: "a11y.button.cancel"))
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
@@ -49,6 +50,7 @@ struct AttendanceForm: View {
                         submitForm()
                     }
                     .disabled(isSubmitting)
+                    .accessibilityLabel(String(localized: "a11y.button.saveAttendance"))
                 }
             }
         }
@@ -114,11 +116,14 @@ struct SingleStudentForm: View {
                     }
                 }
                 .pickerStyle(.menu)
+                .accessibilityLabel(String(localized: "a11y.attendance.statusPicker \(selectedStatus.displayName)"))
             }
 
             Section(String(localized: "attendance.form.notes")) {
                 TextEditor(text: $notes)
                     .frame(minHeight: 80)
+                    .accessibilityLabel(String(localized: "a11y.attendance.notesField"))
+                    .accessibilityHint(String(localized: "a11y.attendance.notesHint"))
             }
 
             // Quick status buttons
@@ -234,6 +239,7 @@ struct StudentMarkRow: View {
             }
             .frame(width: 40, height: 40)
             .clipShape(Circle())
+            .accessibilityHidden(true)
 
             // Student info
             VStack(alignment: .leading, spacing: 2) {
@@ -274,9 +280,12 @@ struct StudentMarkRow: View {
                 .background(statusColor(row.status).opacity(0.2))
                 .foregroundStyle(statusColor(row.status))
                 .clipShape(Capsule())
+                .accessibilityLabel(String(localized: "a11y.attendance.status \(row.status.displayName)"))
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.attendance.studentMark \(row.studentName) \(row.status.displayName)"))
     }
 
     private func statusColor(_ status: AttendanceStatus) -> Color {
@@ -316,6 +325,8 @@ struct StatusButton: View {
                     .stroke(isSelected ? statusColor : .clear, lineWidth: 2)
             )
         }
+        .accessibilityLabel(String(localized: "a11y.attendance.quickSelect \(status.displayName)"))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var statusColor: Color {
@@ -360,6 +371,8 @@ struct ExcuseFormView: View {
                 Section(String(localized: "attendance.excuse.reason")) {
                     TextEditor(text: $reason)
                         .frame(minHeight: 120)
+                        .accessibilityLabel(String(localized: "a11y.excuse.reasonField"))
+                        .accessibilityHint(String(localized: "a11y.excuse.reasonHint"))
 
                     if let error = errors["reason"] {
                         Text(error)
@@ -376,6 +389,8 @@ struct ExcuseFormView: View {
                     .keyboardType(.URL)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
+                    .accessibilityLabel(String(localized: "a11y.excuse.documentUrlField"))
+                    .accessibilityHint(String(localized: "a11y.excuse.documentUrlHint"))
 
                     Text(String(localized: "attendance.excuse.documentHint"))
                         .font(.caption)
@@ -396,6 +411,7 @@ struct ExcuseFormView: View {
                         submitExcuse()
                     }
                     .disabled(isSubmitting || reason.isEmpty)
+                    .accessibilityLabel(String(localized: "a11y.button.submitExcuse"))
                 }
             }
         }
@@ -463,8 +479,9 @@ struct ExcuseReviewForm: View {
                     Text(excuse.reason)
                 }
 
-                if let documentUrl = excuse.documentUrl {
-                    Link(destination: URL(string: documentUrl)!) {
+                if let documentUrl = excuse.documentUrl,
+                   let url = URL(string: documentUrl) {
+                    Link(destination: url) {
                         HStack {
                             Image(systemName: "doc.fill")
                             Text(String(localized: "attendance.excuse.viewDocument"))
@@ -477,6 +494,8 @@ struct ExcuseReviewForm: View {
             Section(String(localized: "attendance.excuse.reviewNotes")) {
                 TextEditor(text: $reviewNotes)
                     .frame(minHeight: 80)
+                    .accessibilityLabel(String(localized: "a11y.excuse.reviewNotesField"))
+                    .accessibilityHint(String(localized: "a11y.excuse.reviewNotesHint"))
             }
 
             // Action buttons
@@ -496,6 +515,7 @@ struct ExcuseReviewForm: View {
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
                     .disabled(isSubmitting)
+                    .accessibilityLabel(String(localized: "a11y.button.rejectExcuse"))
 
                     Button {
                         reviewExcuse(approved: true)
@@ -511,6 +531,7 @@ struct ExcuseReviewForm: View {
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
                     .disabled(isSubmitting)
+                    .accessibilityLabel(String(localized: "a11y.button.approveExcuse"))
                 }
             }
         }

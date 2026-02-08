@@ -23,6 +23,7 @@ struct MessageBubble: View {
                 }
                 .frame(width: 28, height: 28)
                 .clipShape(Circle())
+                .accessibilityHidden(true)
             }
 
             VStack(alignment: isOutgoing ? .trailing : .leading, spacing: 4) {
@@ -46,12 +47,14 @@ struct MessageBubble: View {
                 Text(message.createdAt, style: .time)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
+                    .accessibilityLabel(String(localized: "a11y.label.sentAt \(message.createdAt.formatted(date: .abbreviated, time: .shortened))"))
             }
 
             if !isOutgoing {
                 Spacer(minLength: 60)
             }
         }
+        .accessibilityElement(children: .combine)
     }
 }
 

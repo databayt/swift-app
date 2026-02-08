@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 
 /// Student detail view with tabs
 /// Mirrors: src/components/platform/students/detail.tsx
@@ -30,6 +31,7 @@ struct StudentDetailView: View {
                     Text(String(localized: "student.detail.tab.grades")).tag(2)
                 }
                 .pickerStyle(.segmented)
+                .accessibilityLabel(String(localized: "a11y.student.tabPicker"))
                 .padding(.horizontal)
 
                 // Tab content
@@ -77,6 +79,7 @@ struct StudentDetailView: View {
             }
             .frame(width: 80, height: 80)
             .clipShape(Circle())
+            .accessibilityHidden(true)
 
             // Name
             VStack(spacing: 4) {
@@ -101,6 +104,7 @@ struct StudentDetailView: View {
                     .padding(.vertical, 4)
                     .background(.quaternary)
                     .clipShape(Capsule())
+                    .accessibilityLabel(String(localized: "a11y.student.grNumber \(student.grNumber)"))
 
                 // Status
                 Text(student.studentStatus.displayName)
@@ -111,6 +115,7 @@ struct StudentDetailView: View {
                     .background(statusColor.opacity(0.2))
                     .foregroundStyle(statusColor)
                     .clipShape(Capsule())
+                    .accessibilityLabel(String(localized: "a11y.student.status \(student.studentStatus.displayName)"))
 
                 // Year level
                 if let yearLevel = student.yearLevel {
@@ -121,6 +126,7 @@ struct StudentDetailView: View {
                         .background(.blue.opacity(0.1))
                         .foregroundStyle(.blue)
                         .clipShape(Capsule())
+                        .accessibilityLabel(String(localized: "a11y.student.yearLevel \(yearLevel.name)"))
                 }
             }
         }
@@ -240,7 +246,7 @@ struct StudentDetailView: View {
                 schoolId: schoolId
             )
         } catch {
-            print("Failed to load attendance stats: \(error)")
+            Logger.students.error("Failed to load attendance stats: \(error)")
         }
         isLoadingAttendance = false
     }
@@ -253,7 +259,7 @@ struct StudentDetailView: View {
             )
             recentResults = response.data
         } catch {
-            print("Failed to load grades: \(error)")
+            Logger.students.error("Failed to load grades: \(error)")
         }
         isLoadingGrades = false
     }
@@ -301,6 +307,7 @@ struct DetailRow: View {
                 Image(systemName: icon)
                     .foregroundStyle(.secondary)
                     .frame(width: 20)
+                    .accessibilityHidden(true)
             }
 
             Text(label)
@@ -312,6 +319,8 @@ struct DetailRow: View {
             Text(value)
                 .font(.subheadline)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
 

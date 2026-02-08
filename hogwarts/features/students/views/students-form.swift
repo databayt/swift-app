@@ -122,12 +122,16 @@ struct StudentsForm: View {
                         ),
                         displayedComponents: .date
                     )
+                    .accessibilityLabel(String(localized: "a11y.student.dateOfBirth"))
+                    .accessibilityHint(String(localized: "a11y.student.dateOfBirthHint"))
 
                     Picker(String(localized: "student.form.gender"), selection: $gender) {
                         Text(String(localized: "common.select")).tag(nil as String?)
                         Text(String(localized: "gender.male")).tag("MALE" as String?)
                         Text(String(localized: "gender.female")).tag("FEMALE" as String?)
                     }
+                    .accessibilityLabel(String(localized: "a11y.student.genderPicker"))
+                    .accessibilityHint(String(localized: "a11y.student.genderHint"))
 
                     ValidatedTextField(
                         title: String(localized: "student.form.nationality"),
@@ -142,6 +146,8 @@ struct StudentsForm: View {
                                 Text(level.name).tag(level.id as String?)
                             }
                         }
+                        .accessibilityLabel(String(localized: "a11y.student.yearLevelPicker"))
+                        .accessibilityHint(String(localized: "a11y.student.yearLevelHint"))
                     }
                 }
             }
@@ -159,6 +165,7 @@ struct StudentsForm: View {
                         submitForm()
                     }
                     .disabled(isSubmitting || !isFormValid)
+                    .accessibilityLabel(String(localized: isEditing ? "a11y.button.saveStudent" : "a11y.button.createStudent"))
                 }
             }
             .onAppear {
@@ -284,6 +291,8 @@ struct ValidatedTextField: View {
                 .keyboardType(keyboardType)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .accessibilityLabel(title)
+                .accessibilityHint(isRequired ? String(localized: "a11y.field.required") : "")
 
             if let error = error {
                 Text(error)

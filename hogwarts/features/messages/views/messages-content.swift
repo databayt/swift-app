@@ -34,6 +34,8 @@ struct MessagesContent: View {
                         text: $viewModel.searchText,
                         prompt: String(localized: "messages.search")
                     )
+                    .accessibilityLabel(String(localized: "a11y.field.searchConversations"))
+                    .accessibilityHint(String(localized: "a11y.hint.searchByNameOrMessage"))
 
                 case .empty:
                     EmptyStateView(
@@ -64,6 +66,7 @@ struct MessagesContent: View {
                         } label: {
                             Image(systemName: "square.and.pencil")
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.composeMessage"))
                     }
                 }
             }

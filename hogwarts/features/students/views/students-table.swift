@@ -86,6 +86,7 @@ struct StudentRowView: View {
             }
             .frame(width: 44, height: 44)
             .clipShape(Circle())
+            .accessibilityHidden(true)
 
             // Info
             VStack(alignment: .leading, spacing: 4) {
@@ -116,8 +117,11 @@ struct StudentRowView: View {
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.student.row \(displayName) \(row.status.displayName)"))
     }
 }
 
@@ -135,6 +139,7 @@ struct StatusBadge: View {
             .background(backgroundColor)
             .foregroundStyle(foregroundColor)
             .clipShape(Capsule())
+            .accessibilityLabel(String(localized: "a11y.student.status \(status.displayName)"))
     }
 
     private var backgroundColor: Color {

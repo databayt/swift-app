@@ -19,6 +19,7 @@ struct QRScannerView: View {
                         onCodeScanned: handleScannedCode
                     )
                     .ignoresSafeArea()
+                    .accessibilityLabel(String(localized: "a11y.qr.cameraView"))
                 } else {
                     // Permission request view
                     PermissionRequestView(
@@ -64,6 +65,7 @@ struct QRScannerView: View {
                         dismiss()
                     }
                     .foregroundStyle(.white)
+                    .accessibilityLabel(String(localized: "a11y.button.close"))
                 }
             }
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -93,6 +95,7 @@ struct QRScannerView: View {
                 Text(String(localized: "attendance.qr.scanning"))
                     .font(.subheadline)
             }
+            .accessibilityLabel(String(localized: "a11y.qr.scanning"))
 
         case .processing:
             HStack(spacing: 12) {
@@ -100,12 +103,14 @@ struct QRScannerView: View {
                 Text(String(localized: "attendance.qr.processing"))
                     .font(.subheadline)
             }
+            .accessibilityLabel(String(localized: "a11y.qr.processing"))
 
         case .success(let attendance):
             VStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.largeTitle)
                     .foregroundStyle(.green)
+                    .accessibilityHidden(true)
 
                 Text(String(localized: "attendance.qr.success"))
                     .font(.headline)
@@ -119,14 +124,17 @@ struct QRScannerView: View {
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel(String(localized: "a11y.button.done"))
                 .padding(.top)
             }
+            .accessibilityLabel(String(localized: "a11y.qr.success \(attendance.attendanceStatus.displayName)"))
 
         case .error(let error):
             VStack(spacing: 8) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.largeTitle)
                     .foregroundStyle(.red)
+                    .accessibilityHidden(true)
 
                 Text(String(localized: "attendance.qr.error"))
                     .font(.headline)
@@ -141,8 +149,10 @@ struct QRScannerView: View {
                     viewModel.qrScannerState = .scanning
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel(String(localized: "a11y.button.tryAgain"))
                 .padding(.top)
             }
+            .accessibilityLabel(String(localized: "a11y.qr.error"))
         }
     }
 
@@ -212,6 +222,7 @@ struct PermissionRequestView: View {
             Image(systemName: "camera.fill")
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
 
             Text(String(localized: "attendance.qr.cameraAccess"))
                 .font(.title2)
@@ -227,6 +238,7 @@ struct PermissionRequestView: View {
                 onRequestPermission()
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityLabel(String(localized: "a11y.button.enableCamera"))
         }
         .padding()
     }
@@ -443,6 +455,7 @@ struct QRGeneratorView: View {
                     .padding()
                     .background(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .accessibilityLabel(String(localized: "a11y.qr.generatedCode \(qrSession.code)"))
             }
 
             // Session info

@@ -37,6 +37,7 @@ struct ExamResultRowView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(gradeColor)
             }
+            .accessibilityLabel(String(localized: "a11y.label.grade \(row.grade)"))
 
             // Info
             VStack(alignment: .leading, spacing: 4) {
@@ -85,6 +86,8 @@ struct ExamResultRowView: View {
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.label.examResult \(row.examTitle) \(row.subjectName) \(row.grade)"))
     }
 
     private var gradeColor: Color {
@@ -164,6 +167,7 @@ struct ExamRowView: View {
                 .font(.title2)
                 .foregroundStyle(Color.accentColor)
                 .frame(width: 40)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(exam.title)
@@ -200,8 +204,10 @@ struct ExamRowView: View {
                 .background(statusColor.opacity(0.2))
                 .foregroundStyle(statusColor)
                 .clipShape(Capsule())
+                .accessibilityLabel(String(localized: "a11y.label.examStatus \(exam.examStatusEnum.displayName)"))
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 
     private var examIcon: String {

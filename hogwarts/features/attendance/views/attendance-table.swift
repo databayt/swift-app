@@ -56,6 +56,7 @@ struct AttendanceRowView: View {
             }
             .frame(width: 44, height: 44)
             .clipShape(Circle())
+            .accessibilityHidden(true)
 
             // Info
             VStack(alignment: .leading, spacing: 4) {
@@ -106,6 +107,8 @@ struct AttendanceRowView: View {
             AttendanceStatusBadge(status: row.status)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.attendance.row \(row.studentName) \(row.status.displayName)"))
     }
 }
 
@@ -127,6 +130,7 @@ struct AttendanceStatusBadge: View {
         .background(backgroundColor)
         .foregroundStyle(foregroundColor)
         .clipShape(Capsule())
+        .accessibilityLabel(String(localized: "a11y.attendance.status \(status.displayName)"))
     }
 
     private var backgroundColor: Color {
@@ -228,6 +232,7 @@ struct CompactAttendanceList: View {
                     .foregroundStyle(.secondary)
             }
             .padding(.vertical, 4)
+            .accessibilityElement(children: .combine)
         }
     }
 

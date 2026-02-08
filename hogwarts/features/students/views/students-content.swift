@@ -76,6 +76,7 @@ struct StudentsContent: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityLabel(String(localized: "a11y.button.addStudent"))
                 }
             }
             .sheet(isPresented: $viewModel.isShowingForm) {
@@ -93,11 +94,11 @@ struct StudentsContent: View {
                 )
             }
             .alert(
-                "Error",
+                String(localized: "error.title"),
                 isPresented: $viewModel.showError,
                 presenting: viewModel.error
             ) { _ in
-                Button("OK") {}
+                Button(String(localized: "common.ok")) {}
             } message: { error in
                 Text(error.localizedDescription)
             }
@@ -141,6 +142,8 @@ struct StudentsToolbar: View {
                 TextField(String(localized: "student.search.placeholder"), text: $searchText)
                     .textFieldStyle(.plain)
                     .autocorrectionDisabled()
+                    .accessibilityLabel(String(localized: "a11y.students.searchField"))
+                    .accessibilityHint(String(localized: "a11y.students.searchHint"))
                     .onSubmit {
                         Task { await onSearch() }
                     }
@@ -153,6 +156,7 @@ struct StudentsToolbar: View {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)
                     }
+                    .accessibilityLabel(String(localized: "a11y.button.clearSearch"))
                 }
             }
             .padding(10)
@@ -168,6 +172,8 @@ struct StudentsToolbar: View {
                             isSelected: filters.yearLevelId == nil,
                             action: { onYearLevelFilter(nil) }
                         )
+                        .accessibilityLabel(String(localized: "a11y.filter.allYearLevels"))
+                        .accessibilityAddTraits(filters.yearLevelId == nil ? .isSelected : [])
 
                         ForEach(yearLevels) { yearLevel in
                             FilterChip(
@@ -175,6 +181,8 @@ struct StudentsToolbar: View {
                                 isSelected: filters.yearLevelId == yearLevel.id,
                                 action: { onYearLevelFilter(yearLevel.id) }
                             )
+                            .accessibilityLabel(yearLevel.name)
+                            .accessibilityAddTraits(filters.yearLevelId == yearLevel.id ? .isSelected : [])
                         }
                     }
                 }
@@ -188,6 +196,8 @@ struct StudentsToolbar: View {
                         isSelected: filters.status == nil,
                         action: { onFilter(nil) }
                     )
+                    .accessibilityLabel(String(localized: "a11y.filter.allStatuses"))
+                    .accessibilityAddTraits(filters.status == nil ? .isSelected : [])
 
                     ForEach(StudentStatus.allCases, id: \.self) { status in
                         FilterChip(
@@ -195,6 +205,8 @@ struct StudentsToolbar: View {
                             isSelected: filters.status == status,
                             action: { onFilter(status) }
                         )
+                        .accessibilityLabel(status.displayName)
+                        .accessibilityAddTraits(filters.status == status ? .isSelected : [])
                     }
                 }
             }

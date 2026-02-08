@@ -162,6 +162,9 @@ struct MainTabView: View {
                 .tag(AppTab.profile)
         }
         .environment(navigationState)
+        .overlay(alignment: .top) {
+            SyncStatusBanner()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .didReceiveNotification)) { notification in
             if let destination = NotificationRouter.destination(from: notification.userInfo ?? [:]) {
                 navigationState.navigate(to: destination)

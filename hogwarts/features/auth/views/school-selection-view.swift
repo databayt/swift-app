@@ -43,6 +43,7 @@ struct SchoolSelectionView: View {
                         }
                         .frame(width: 44, height: 44)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .accessibilityHidden(true)
 
                         // School info
                         VStack(alignment: .leading, spacing: 2) {
@@ -67,14 +68,17 @@ struct SchoolSelectionView: View {
                                 .background(Color.accentColor.opacity(0.1))
                                 .foregroundStyle(Color.accentColor)
                                 .clipShape(Capsule())
+                                .accessibilityLabel(String(localized: "a11y.school.lastUsed"))
                         }
 
                         Image(systemName: "chevron.right")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
+                            .accessibilityHidden(true)
                     }
                 }
                 .foregroundStyle(.primary)
+                .accessibilityLabel(school.name)
             }
         }
         .listStyle(.insetGrouped)

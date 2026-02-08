@@ -17,6 +17,7 @@ struct AttendanceContent: View {
                     displayedComponents: .date
                 )
                 .datePickerStyle(.graphical)
+                .accessibilityLabel(String(localized: "a11y.attendance.datePicker"))
                 .padding()
                 .onChange(of: viewModel.selectedDate) { _, newDate in
                     Task { await viewModel.loadAttendanceForDate(newDate) }
@@ -74,12 +75,14 @@ struct AttendanceContent: View {
                         } label: {
                             Image(systemName: "plus")
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.markAttendance"))
                     } else if viewModel.capabilities.canQRCheckIn {
                         Button {
                             viewModel.showQRScanner()
                         } label: {
                             Image(systemName: "qrcode.viewfinder")
                         }
+                        .accessibilityLabel(String(localized: "a11y.button.scanQR"))
                     }
                 }
             }
@@ -154,6 +157,7 @@ struct TeacherAttendanceContent: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .accessibilityLabel(String(localized: "a11y.attendance.classFilter"))
                 .padding(.horizontal)
             }
 
@@ -249,6 +253,7 @@ struct StudentAttendanceContent: View {
                 }
             }
             .pickerStyle(.segmented)
+            .accessibilityLabel(String(localized: "a11y.attendance.displayMode"))
             .padding(.horizontal)
             .padding(.vertical, 8)
 
@@ -409,6 +414,7 @@ struct ViewOnlyAttendanceContent: View {
             Image(systemName: "lock.fill")
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
                 .padding()
 
             Text(String(localized: "attendance.noAccess"))
@@ -433,6 +439,8 @@ struct AttendanceToolbar: View {
                         isSelected: viewModel.filters.status == nil,
                         action: { viewModel.filterByStatus(nil) }
                     )
+                    .accessibilityLabel(String(localized: "a11y.filter.allStatuses"))
+                    .accessibilityAddTraits(viewModel.filters.status == nil ? .isSelected : [])
 
                     ForEach(AttendanceStatus.allCases, id: \.self) { status in
                         FilterChip(
@@ -440,6 +448,8 @@ struct AttendanceToolbar: View {
                             isSelected: viewModel.filters.status == status,
                             action: { viewModel.filterByStatus(status) }
                         )
+                        .accessibilityLabel(status.displayName)
+                        .accessibilityAddTraits(viewModel.filters.status == status ? .isSelected : [])
                     }
                 }
             }
@@ -484,6 +494,8 @@ struct AttendanceStatsBar: View {
         }
         .padding()
         .background(.quaternary)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.attendance.statsBar"))
     }
 }
 
@@ -540,6 +552,8 @@ struct AttendanceStatsCard: View {
         .padding()
         .background(.quaternary)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.attendance.statsCard"))
     }
 }
 
@@ -557,6 +571,8 @@ struct StatItem: View {
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
 
@@ -623,8 +639,10 @@ struct AttendanceHistoryRow: View {
                 .background(statusColor.opacity(0.2))
                 .foregroundStyle(statusColor)
                 .clipShape(Capsule())
+                .accessibilityLabel(String(localized: "a11y.attendance.status \(row.status.displayName)"))
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
     }
 
     private var statusColor: Color {

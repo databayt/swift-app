@@ -19,6 +19,7 @@ struct TimetableContent: View {
                 }
                 .pickerStyle(.segmented)
                 .padding()
+                .accessibilityLabel(String(localized: "a11y.timetable.viewModePicker"))
                 .onChange(of: viewModel.displayMode) { _, _ in
                     Task { await viewModel.refresh() }
                 }
@@ -29,6 +30,7 @@ struct TimetableContent: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .padding(.bottom, 4)
+                        .accessibilityLabel(String(localized: "a11y.timetable.termInfo \(termName)"))
                 }
 
                 Divider()
@@ -52,6 +54,7 @@ struct TimetableContent: View {
                             message: String(localized: "timetable.empty.message"),
                             systemImage: "calendar"
                         )
+                        .accessibilityElement(children: .combine)
 
                     case .error(let error):
                         ErrorStateView(

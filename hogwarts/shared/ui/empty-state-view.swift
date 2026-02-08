@@ -14,6 +14,7 @@ struct EmptyStateView: View {
             Image(systemName: systemImage)
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
 
             VStack(spacing: 8) {
                 Text(title)
@@ -32,10 +33,12 @@ struct EmptyStateView: View {
                         .fontWeight(.semibold)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityHint(String(localized: "a11y.hint.tapToPerformAction"))
             }
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
     }
 }
 

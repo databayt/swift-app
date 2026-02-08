@@ -5,11 +5,11 @@
 project: hogwarts-ios
 version: 1.0.0
 created_at: 2025-12-17
-updated_at: 2026-02-09
+updated_at: 2026-02-08
 
 # Current Position
 current_phase: implementation
-current_sprint: 4
+current_sprint: 5
 
 # BMAD Phases
 phases:
@@ -50,7 +50,7 @@ phases:
     status: in_progress
     started_at: 2026-02-08
     completed_at: null
-    current_sprint: 4
+    current_sprint: 5
 
 # Implementation Status (existing code)
 implementation_status:
@@ -201,7 +201,7 @@ epics:
         priority: P1
       - id: ATT-006
         title: Bulk Attendance
-        status: pending
+        status: complete
         priority: P2
 
   - id: EPIC-004
@@ -342,6 +342,53 @@ epics:
         status: complete
         priority: P0
 
+  - id: EPIC-010
+    name: Polish & App Store Readiness
+    priority: P0
+    sprint: 5
+    status: complete
+    stories:
+      - id: POLISH-001
+        title: Privacy Manifest
+        status: complete
+        priority: P0
+      - id: POLISH-002
+        title: Launch Screen
+        status: complete
+        priority: P0
+      - id: POLISH-003
+        title: Accessibility Labels
+        status: complete
+        priority: P0
+      - id: POLISH-004
+        title: Fix Force Unwrap
+        status: complete
+        priority: P0
+      - id: POLISH-005
+        title: Replace print() with os.Logger
+        status: complete
+        priority: P0
+      - id: POLISH-006
+        title: Localize Hardcoded Strings
+        status: complete
+        priority: P1
+      - id: POLISH-007
+        title: Unit Tests (7 features)
+        status: complete
+        priority: P1
+      - id: POLISH-008
+        title: Bulk Attendance Verification
+        status: complete
+        priority: P1
+      - id: POLISH-009
+        title: Sync Status Banner
+        status: complete
+        priority: P2
+      - id: POLISH-010
+        title: APIError Localization
+        status: complete
+        priority: P2
+
 # Sprint Plan
 sprints:
   - number: 1
@@ -435,15 +482,31 @@ sprints:
       - NOTIF-003
 
   - number: 5
-    name: Polish
-    status: pending
-    started_at: null
-    completed_at: null
+    name: Polish & App Store Readiness
+    status: complete
+    started_at: 2026-02-08
+    completed_at: 2026-02-08
     goals:
-      - Performance optimization
-      - Edge case handling
-      - Beta feedback incorporation
-      - App Store submission
+      - Privacy Manifest (xcprivacy)
+      - Launch Screen configuration
+      - Accessibility labels (all 37 view files)
+      - Force unwrap elimination
+      - os.Logger replacing print() calls
+      - Localization of hardcoded strings
+      - Unit tests for 7 features (~42 new tests)
+      - Sync status banner
+      - Full Localizable.xcstrings (609 keys, en+ar)
+    stories:
+      - POLISH-001
+      - POLISH-002
+      - POLISH-003
+      - POLISH-004
+      - POLISH-005
+      - POLISH-006
+      - POLISH-007
+      - POLISH-008
+      - POLISH-009
+      - POLISH-010
 
 # Blockers
 blockers: []

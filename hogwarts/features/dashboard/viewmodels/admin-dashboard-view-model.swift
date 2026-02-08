@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 
 /// ViewModel for Admin Dashboard
 /// Mirrors: src/components/platform/dashboard/admin.tsx
@@ -70,7 +71,7 @@ final class AdminDashboardViewModel {
             attendanceRate = stats.attendanceRate
             averageGrade = stats.averageGrade
         } catch {
-            print("Failed to load admin stats: \(error)")
+            Logger.dashboard.error("Failed to load admin stats: \(error)")
         }
     }
 
@@ -82,7 +83,7 @@ final class AdminDashboardViewModel {
                 as: AdminTodayAttendance.self
             )
         } catch {
-            print("Failed to load today attendance: \(error)")
+            Logger.dashboard.error("Failed to load today attendance: \(error)")
         }
     }
 
@@ -94,7 +95,7 @@ final class AdminDashboardViewModel {
                 as: AdminGradePerformance.self
             )
         } catch {
-            print("Failed to load grade performance: \(error)")
+            Logger.dashboard.error("Failed to load grade performance: \(error)")
         }
     }
 
@@ -106,7 +107,7 @@ final class AdminDashboardViewModel {
                 as: [AdminActivityItem].self
             )
         } catch {
-            print("Failed to load recent activity: \(error)")
+            Logger.dashboard.error("Failed to load recent activity: \(error)")
         }
     }
 }

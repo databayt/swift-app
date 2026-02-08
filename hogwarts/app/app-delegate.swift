@@ -2,6 +2,7 @@ import UIKit
 import UserNotifications
 import GoogleSignIn
 import FacebookCore
+import os
 
 /// App delegate for push notifications and OAuth URL handling
 /// Handles APNs registration, notification delivery, and OAuth callbacks
@@ -67,7 +68,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        print("Failed to register for notifications: \(error)")
+        Logger.app.error("Failed to register for notifications: \(error)")
     }
 
     /// Handle silent push - trigger sync

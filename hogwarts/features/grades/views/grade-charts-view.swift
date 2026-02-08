@@ -32,6 +32,8 @@ struct GradeChartsView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
+                .accessibilityLabel(String(localized: "a11y.picker.chartType"))
+                .accessibilityHint(String(localized: "a11y.hint.switchChartType"))
 
                 // Chart content
                 switch selectedChart {
@@ -79,9 +81,13 @@ struct GradeChartsView: View {
                 // Legend
                 HStack(spacing: 16) {
                     legendItem(color: .green, label: "90+")
+                        .accessibilityLabel(String(localized: "a11y.legend.excellent"))
                     legendItem(color: .blue, label: "75-89")
+                        .accessibilityLabel(String(localized: "a11y.legend.good"))
                     legendItem(color: .orange, label: "60-74")
+                        .accessibilityLabel(String(localized: "a11y.legend.average"))
                     legendItem(color: .red, label: "<60")
+                        .accessibilityLabel(String(localized: "a11y.legend.belowAverage"))
                 }
                 .font(.caption)
                 .frame(maxWidth: .infinity)
@@ -92,6 +98,8 @@ struct GradeChartsView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
             .padding(.horizontal)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "a11y.label.subjectAveragesChart \(subjects.count)"))
         } else {
             noDataView
         }
@@ -165,6 +173,8 @@ struct GradeChartsView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
             .padding(.horizontal)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "a11y.label.gradeProgressionChart \(sortedResults.count)"))
         } else {
             noDataView
         }
@@ -178,6 +188,7 @@ struct GradeChartsView: View {
             Image(systemName: "chart.bar.xaxis")
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
             Text(String(localized: "grade.chart.noData"))
                 .foregroundStyle(.secondary)
         }

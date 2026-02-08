@@ -20,6 +20,7 @@ struct NotificationRow: View {
                     .foregroundStyle(type.color)
             }
             .frame(width: 36, height: 36)
+            .accessibilityHidden(true)
 
             // Content
             VStack(alignment: .leading, spacing: 4) {
@@ -49,6 +50,7 @@ struct NotificationRow: View {
                     .background(type.color.opacity(0.1))
                     .foregroundStyle(type.color)
                     .clipShape(Capsule())
+                    .accessibilityLabel(String(localized: "a11y.notification.type \(type.label)"))
             }
 
             // Unread indicator
@@ -57,9 +59,13 @@ struct NotificationRow: View {
                     .fill(.blue)
                     .frame(width: 8, height: 8)
                     .padding(.top, 4)
+                    .accessibilityHidden(true)
             }
         }
         .padding(.vertical, 4)
         .opacity(notification.isRead ? 0.7 : 1.0)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(notification.title + ", " + notification.message)
+        .accessibilityHint(notification.isRead ? String(localized: "a11y.notification.read") : String(localized: "a11y.notification.unread"))
     }
 }

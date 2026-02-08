@@ -1,4 +1,5 @@
 import SwiftUI
+import os
 
 /// Grade entry form - Create Exam or Enter Marks
 /// Mirrors: src/components/platform/grades/form.tsx
@@ -70,9 +71,13 @@ struct CreateExamForm: View {
                         Text(type.displayName).tag(type)
                     }
                 }
+                .accessibilityLabel(String(localized: "a11y.picker.examType"))
+                .accessibilityHint(String(localized: "a11y.hint.selectExamType"))
 
                 TextField(String(localized: "grade.form.description"), text: $description, axis: .vertical)
                     .lineLimit(3)
+                    .accessibilityLabel(String(localized: "a11y.field.examDescription"))
+                    .accessibilityHint(String(localized: "a11y.hint.enterExamDescription"))
             }
 
             Section(String(localized: "grade.form.section.class")) {
@@ -82,6 +87,8 @@ struct CreateExamForm: View {
                         Text(cls.displayName).tag(cls.id as String?)
                     }
                 }
+                .accessibilityLabel(String(localized: "a11y.picker.class"))
+                .accessibilityHint(String(localized: "a11y.hint.selectClass"))
                 .onChange(of: selectedClassId) { _, newValue in
                     if let classId = newValue {
                         Task { await loadSubjects(classId: classId) }
@@ -95,6 +102,8 @@ struct CreateExamForm: View {
                             Text(subject.displayName).tag(subject.id as String?)
                         }
                     }
+                    .accessibilityLabel(String(localized: "a11y.picker.subject"))
+                    .accessibilityHint(String(localized: "a11y.hint.selectSubject"))
                 }
 
                 if let error = errors["classId"] {
@@ -119,6 +128,8 @@ struct CreateExamForm: View {
                             .foregroundStyle(.secondary)
                         TextField("100", text: $totalMarks)
                             .keyboardType(.decimalPad)
+                            .accessibilityLabel(String(localized: "a11y.field.totalMarks"))
+                            .accessibilityHint(String(localized: "a11y.hint.enterTotalMarks"))
                     }
 
                     VStack(alignment: .leading) {
@@ -127,6 +138,8 @@ struct CreateExamForm: View {
                             .foregroundStyle(.secondary)
                         TextField("50", text: $passingMarks)
                             .keyboardType(.decimalPad)
+                            .accessibilityLabel(String(localized: "a11y.field.passingMarks"))
+                            .accessibilityHint(String(localized: "a11y.hint.enterPassingMarks"))
                     }
                 }
 
@@ -154,6 +167,7 @@ struct CreateExamForm: View {
                     }
                 }
                 .disabled(isSubmitting)
+                .accessibilityLabel(String(localized: "a11y.button.createExam"))
             }
         }
         .task {
@@ -179,7 +193,7 @@ struct CreateExamForm: View {
         do {
             availableClasses = try await actions.getTeacherClasses(schoolId: schoolId)
         } catch {
-            print("Failed to load classes: \(error)")
+            Logger.grades.error("Failed to load classes: \(error)")
         }
     }
 
@@ -188,7 +202,7 @@ struct CreateExamForm: View {
         do {
             availableSubjects = try await gradesActions.getSubjects(classId: classId, schoolId: schoolId)
         } catch {
-            print("Failed to load subjects: \(error)")
+            Logger.grades.error("Failed to load subjects: \(error)")
         }
     }
 
@@ -313,6 +327,7 @@ struct EnterMarksForm: View {
                 }
                 .disabled(isSubmitting)
                 .padding()
+                .accessibilityLabel(String(localized: "a11y.button.submitMarks"))
             }
         }
         .task {
@@ -333,7 +348,7 @@ struct EnterMarksForm: View {
             isLoading = false
         } catch {
             isLoading = false
-            print("Failed to load students: \(error)")
+            Logger.grades.error("Failed to load students: \(error)")
         }
     }
 
@@ -411,6 +426,7 @@ struct MarksEntryRowView: View {
                     .background(gradeColor.opacity(0.2))
                     .foregroundStyle(gradeColor)
                     .clipShape(Capsule())
+                    .accessibilityLabel(String(localized: "a11y.label.grade \(gradeLabel)"))
             }
 
             HStack(spacing: 12) {
@@ -420,6 +436,8 @@ struct MarksEntryRowView: View {
                         .keyboardType(.decimalPad)
                         .frame(width: 60)
                         .textFieldStyle(.roundedBorder)
+                        .accessibilityLabel(String(localized: "a11y.field.marksFor \(row.studentName)"))
+                        .accessibilityHint(String(localized: "a11y.hint.enterMarksOutOf \(String(format: "%.0f", totalMarks))"))
 
                     Text("/ \(String(format: "%.0f", totalMarks))")
                         .font(.subheadline)
@@ -430,6 +448,8 @@ struct MarksEntryRowView: View {
                 TextField(String(localized: "grade.form.remarks"), text: $row.remarks)
                     .font(.subheadline)
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityLabel(String(localized: "a11y.field.remarksFor \(row.studentName)"))
+                    .accessibilityHint(String(localized: "a11y.hint.enterRemarks"))
             }
 
             if let error = error {

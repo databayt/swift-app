@@ -30,6 +30,7 @@ struct AttendanceChartsView: View {
                 }
             }
             .pickerStyle(.segmented)
+            .accessibilityLabel(String(localized: "a11y.attendance.chartType"))
             .padding(.horizontal)
 
             switch selectedChart {
@@ -68,6 +69,8 @@ struct AttendanceChartsView: View {
                     }
                 }
                 .frame(height: 220)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(String(localized: "a11y.attendance.breakdownChart \(Int(stats.attendanceRate))"))
 
                 // Center label
                 .overlay {
@@ -92,6 +95,7 @@ struct AttendanceChartsView: View {
                             Circle()
                                 .fill(statusColor(item.status))
                                 .frame(width: 8, height: 8)
+                                .accessibilityHidden(true)
                             Text(item.status.displayName)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -99,6 +103,8 @@ struct AttendanceChartsView: View {
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(item.status.displayName): \(item.count)")
                     }
                 }
                 .padding(.horizontal)
@@ -157,6 +163,8 @@ struct AttendanceChartsView: View {
                     }
                 }
                 .frame(height: 220)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(String(localized: "a11y.attendance.trendChart"))
                 .padding(.horizontal)
             }
             .padding()
@@ -222,6 +230,7 @@ struct AttendanceChartsView: View {
             Image(systemName: "chart.pie")
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
             Text(String(localized: "attendance.chart.noData"))
                 .foregroundStyle(.secondary)
         }

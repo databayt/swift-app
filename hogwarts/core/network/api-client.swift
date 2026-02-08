@@ -16,7 +16,10 @@ actor APIClient {
     private var authorizationProvider: (@Sendable () -> String?)?
 
     private init() {
-        self.baseURL = URL(string: "https://ed.databayt.org/api")!
+        guard let url = URL(string: "https://ed.databayt.org/api") else {
+            fatalError("Invalid base URL")
+        }
+        self.baseURL = url
 
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30
@@ -182,19 +185,19 @@ enum APIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidResponse:
-            return "Invalid response from server"
+            return String(localized: "error.api.invalidResponse")
         case .unauthorized:
-            return "Please sign in to continue"
+            return String(localized: "error.api.unauthorized")
         case .forbidden:
-            return "You don't have permission"
+            return String(localized: "error.api.forbidden")
         case .notFound:
-            return "Resource not found"
+            return String(localized: "error.api.notFound")
         case .validationFailed(let message):
             return message
         case .serverError(let code):
-            return "Server error (\(code))"
+            return String(localized: "error.api.serverError \(code)")
         case .unknown(let code):
-            return "Unknown error (\(code))"
+            return String(localized: "error.api.unknownError \(code)")
         case .networkError(let error):
             return error.localizedDescription
         }

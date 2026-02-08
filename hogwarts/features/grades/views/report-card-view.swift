@@ -58,6 +58,7 @@ struct ReportCardView: View {
                 .resizable()
                 .frame(width: 60, height: 60)
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
 
             Text(reportCard.studentName)
                 .font(.title2)
@@ -89,6 +90,8 @@ struct ReportCardView: View {
         .padding()
         .background(.quaternary)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.label.studentHeader \(reportCard.studentName) \(reportCard.grNumber)"))
     }
 
     // MARK: - Subject Grades
@@ -125,6 +128,7 @@ struct ReportCardView: View {
                     label: String(localized: "grade.reportCard.average"),
                     color: reportCard.overallAverage >= 50 ? .green : .red
                 )
+                .accessibilityLabel(String(localized: "a11y.label.overallAverage \(String(format: "%.1f", reportCard.overallAverage))"))
 
                 // GPA
                 SummaryStatView(
@@ -132,6 +136,7 @@ struct ReportCardView: View {
                     label: String(localized: "grade.reportCard.gpa"),
                     color: .blue
                 )
+                .accessibilityLabel(String(localized: "a11y.label.gpa \(String(format: "%.2f", reportCard.gpa))"))
 
                 // Grade
                 SummaryStatView(
@@ -139,6 +144,7 @@ struct ReportCardView: View {
                     label: String(localized: "grade.reportCard.grade"),
                     color: .purple
                 )
+                .accessibilityLabel(String(localized: "a11y.label.letterGrade \(GradeCalculator.letterGrade(for: reportCard.overallAverage))"))
 
                 // Rank
                 if let rank = reportCard.rank, let total = reportCard.totalStudents {
@@ -147,6 +153,7 @@ struct ReportCardView: View {
                         label: String(localized: "grade.reportCard.rank"),
                         color: .orange
                     )
+                    .accessibilityLabel(String(localized: "a11y.label.rank \(rank) \(total)"))
                 }
             }
         }
@@ -260,9 +267,13 @@ struct SubjectGradeRow: View {
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                        .accessibilityHidden(true)
                 }
             }
             .padding(.vertical, 8)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "a11y.label.subjectGrade \(subject.displayName) \(String(format: "%.1f", subject.average)) \(subject.grade)"))
+            .accessibilityHint(String(localized: "a11y.hint.tapToExpandExams"))
 
             // Exam breakdown
             if isExpanded {
@@ -317,6 +328,7 @@ struct SummaryStatView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
     }
 }
 

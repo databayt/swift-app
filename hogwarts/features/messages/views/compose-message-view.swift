@@ -39,6 +39,7 @@ struct ComposeMessageView: View {
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     }
+                                    .accessibilityLabel(String(localized: "a11y.button.removeRecipient \(recipient.displayName)"))
                                 }
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
@@ -104,6 +105,8 @@ struct ComposeMessageView: View {
                     text: $searchText,
                     prompt: String(localized: "messages.searchRecipients")
                 )
+                .accessibilityLabel(String(localized: "a11y.field.recipientSearch"))
+                .accessibilityHint(String(localized: "a11y.hint.searchForRecipients"))
 
                 Divider()
 
@@ -116,6 +119,8 @@ struct ComposeMessageView: View {
                     )
                     .lineLimit(1...3)
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityLabel(String(localized: "a11y.field.messageInput"))
+                    .accessibilityHint(String(localized: "a11y.hint.typeFirstMessage"))
 
                     Button {
                         Task { await createConversation() }
@@ -129,6 +134,7 @@ struct ComposeMessageView: View {
                     }
                     .disabled(!canSend)
                     .tint(.blue)
+                    .accessibilityLabel(String(localized: "a11y.button.sendMessage"))
                 }
                 .padding()
                 .background(.bar)

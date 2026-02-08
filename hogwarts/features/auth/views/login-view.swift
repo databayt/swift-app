@@ -25,6 +25,7 @@ struct LoginView: View {
                         Image(systemName: "building.columns.fill")
                             .font(.system(size: 60))
                             .foregroundStyle(Color.accentColor)
+                            .accessibilityHidden(true)
 
                         Text("Hogwarts")
                             .font(.largeTitle)
@@ -50,6 +51,8 @@ struct LoginView: View {
                                 .submitLabel(.next)
                                 .onSubmit { focusedField = .password }
                                 .onChange(of: viewModel.email) { viewModel.onEmailChanged() }
+                                .accessibilityLabel(String(localized: "a11y.login.email"))
+                                .accessibilityHint(String(localized: "a11y.hint.enterEmail"))
 
                             if let emailError = viewModel.emailError {
                                 Text(emailError)
@@ -67,6 +70,8 @@ struct LoginView: View {
                                 .submitLabel(.go)
                                 .onSubmit { submitForm() }
                                 .onChange(of: viewModel.password) { viewModel.onPasswordChanged() }
+                                .accessibilityLabel(String(localized: "a11y.login.password"))
+                                .accessibilityHint(String(localized: "a11y.hint.enterPassword"))
 
                             if let passwordError = viewModel.passwordError {
                                 Text(passwordError)
@@ -92,6 +97,7 @@ struct LoginView: View {
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .disabled(!viewModel.canSubmit)
+                        .accessibilityLabel(String(localized: "a11y.button.signIn"))
                     }
                     .padding(.horizontal)
 
@@ -125,6 +131,7 @@ struct LoginView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                         .disabled(viewModel.isLoading)
+                        .accessibilityLabel(String(localized: "a11y.button.continueGoogle"))
 
                         // Facebook Sign In
                         Button {
@@ -141,6 +148,7 @@ struct LoginView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                         .disabled(viewModel.isLoading)
+                        .accessibilityLabel(String(localized: "a11y.button.continueFacebook"))
 
                         // Apple Sign In
                         SignInWithAppleButton(.signIn) { request in
