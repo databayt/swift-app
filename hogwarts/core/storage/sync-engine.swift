@@ -89,7 +89,9 @@ actor SyncEngine {
             let context = DataContainer.shared.modelContext
 
             let descriptor = FetchDescriptor<PendingAction>(
-                predicate: #Predicate { $0.status == "pending" },
+                predicate: #Predicate {
+                    $0.status == "pending" || ($0.status == "failed" && $0.retryCount < 3)
+                },
                 sortBy: [SortDescriptor(\.createdAt)]
             )
 
@@ -105,6 +107,12 @@ actor SyncEngine {
 
     @MainActor
     private func processAction(_ action: PendingAction, context: ModelContext) async {
+        // Exponential backoff before retry
+        if action.retryCount > 0 {
+            let delay = pow(2.0, Double(action.retryCount))
+            try? await Task.sleep(for: .seconds(delay))
+        }
+
         action.status = SyncStatus.syncing.rawValue
         try? context.save()
 
@@ -117,9 +125,14 @@ actor SyncEngine {
             try await executeAction(endpoint: endpoint, method: method, payload: payload)
             action.status = SyncStatus.completed.rawValue
         } catch {
-            action.status = SyncStatus.failed.rawValue
             action.retryCount += 1
-            action.errorMessage = error.localizedDescription
+            if action.retryCount >= 3 {
+                action.status = SyncStatus.failed.rawValue
+                action.errorMessage = "Max retries exceeded: \(error.localizedDescription)"
+            } else {
+                action.status = SyncStatus.pending.rawValue
+                action.errorMessage = error.localizedDescription
+            }
         }
 
         try? context.save()

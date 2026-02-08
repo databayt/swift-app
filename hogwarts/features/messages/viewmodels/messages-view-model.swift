@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// ViewModel for Messages conversation list
 /// Mirrors: Logic from messages/content.tsx
@@ -54,7 +55,7 @@ final class MessagesViewModel {
 
     // MARK: - Load Actions
 
-    /// Load conversations list
+    /// Load conversations list (offline-first)
     func loadConversations() async {
         guard let schoolId = tenantContext?.schoolId else {
             viewState = .error(APIError.unauthorized)
@@ -71,10 +72,19 @@ final class MessagesViewModel {
             } else {
                 viewState = .loaded(conversations)
             }
+
+            // Cache to SwiftData
+            cacheConversations(conversations, schoolId: schoolId)
         } catch {
-            viewState = .error(error)
-            self.error = error
-            showError = true
+            // Offline fallback: read from SwiftData
+            let cached = loadCachedConversations(schoolId: schoolId)
+            if !cached.isEmpty {
+                viewState = .loaded(cached)
+            } else {
+                viewState = .error(error)
+                self.error = error
+                showError = true
+            }
         }
     }
 
@@ -93,5 +103,38 @@ final class MessagesViewModel {
         isShowingCompose = false
         // Reload to get updated list
         Task { await loadConversations() }
+    }
+
+    // MARK: - SwiftData Cache
+
+    /// Cache conversations to SwiftData
+    private func cacheConversations(_ conversations: [Conversation], schoolId: String) {
+        let context = DataContainer.shared.modelContext
+        for conv in conversations {
+            let convId = conv.id
+            let descriptor = FetchDescriptor<ConversationModel>(
+                predicate: #Predicate { $0.id == convId }
+            )
+            if let existing = try? context.fetch(descriptor).first {
+                existing.update(from: conv)
+                existing.lastSyncedAt = Date()
+            } else {
+                let model = ConversationModel(from: conv, schoolId: schoolId)
+                model.lastSyncedAt = Date()
+                context.insert(model)
+            }
+        }
+        try? context.save()
+    }
+
+    /// Load cached conversations from SwiftData
+    private func loadCachedConversations(schoolId: String) -> [Conversation] {
+        let context = DataContainer.shared.modelContext
+        let descriptor = FetchDescriptor<ConversationModel>(
+            predicate: #Predicate { $0.schoolId == schoolId },
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        guard let models = try? context.fetch(descriptor) else { return [] }
+        return models.map { Conversation(from: $0) }
     }
 }

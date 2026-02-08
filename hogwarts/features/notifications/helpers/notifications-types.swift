@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// Type definitions for Notifications feature
 /// Mirrors: src/components/platform/notifications/types.ts
@@ -19,6 +20,30 @@ struct AppNotification: Codable, Identifiable {
 
     var notificationType: NotificationType {
         NotificationType(rawValue: type) ?? .system
+    }
+}
+
+// MARK: - SwiftData Conversion
+
+extension AppNotification {
+    /// Initialize from SwiftData model (offline cache)
+    init(from model: NotificationModel) {
+        let dataString: String? = if let data = model.data {
+            String(data: data, encoding: .utf8)
+        } else {
+            nil
+        }
+        self.init(
+            id: model.id,
+            userId: model.userId,
+            type: model.type,
+            title: model.title,
+            message: model.message,
+            schoolId: model.schoolId,
+            data: dataString,
+            isRead: model.isRead,
+            createdAt: model.createdAt
+        )
     }
 }
 

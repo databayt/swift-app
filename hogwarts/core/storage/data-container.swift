@@ -10,7 +10,37 @@ final class DataContainer {
     let container: ModelContainer
 
     private init() {
-        let schema = Schema([
+        let schema = Schema(versionedSchema: HogwartsSchemaV1.self)
+
+        let config = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            allowsSave: true
+        )
+
+        do {
+            container = try ModelContainer(
+                for: schema,
+                migrationPlan: HogwartsMigrationPlan.self,
+                configurations: config
+            )
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
+
+    var modelContext: ModelContext {
+        container.mainContext
+    }
+}
+
+// MARK: - Versioned Schema
+
+enum HogwartsSchemaV1: VersionedSchema {
+    nonisolated(unsafe) static var versionIdentifier = Schema.Version(1, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [
             // Core models
             UserModel.self,
             SchoolModel.self,
@@ -29,23 +59,17 @@ final class DataContainer {
             // Sync models
             PendingAction.self,
             SyncMetadata.self
-        ])
+        ]
+    }
+}
 
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            allowsSave: true
-        )
-
-        do {
-            container = try ModelContainer(for: schema, configurations: config)
-        } catch {
-            fatalError("Failed to create ModelContainer: \(error)")
-        }
+enum HogwartsMigrationPlan: SchemaMigrationPlan {
+    static var schemas: [any VersionedSchema.Type] {
+        [HogwartsSchemaV1.self]
     }
 
-    var modelContext: ModelContext {
-        container.mainContext
+    static var stages: [MigrationStage] {
+        []
     }
 }
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// Type definitions for Timetable feature
 /// Mirrors: src/components/platform/timetable/types.ts
@@ -24,6 +25,28 @@ struct TimetableEntry: Codable, Identifiable, Hashable {
 
     var timeRange: String {
         "\(startTime) - \(endTime)"
+    }
+}
+
+// MARK: - SwiftData Conversion
+
+extension TimetableEntry {
+    /// Initialize from SwiftData model
+    init(from model: TimetableModel) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        self.init(
+            id: model.id,
+            subjectName: model.subjectName ?? "",
+            startTime: formatter.string(from: model.startTime),
+            endTime: formatter.string(from: model.endTime),
+            subjectNameAr: nil,
+            teacherName: model.teacherName,
+            classroomName: model.classroomName,
+            classId: nil,
+            dayOfWeek: model.dayOfWeek,
+            periodNumber: nil
+        )
     }
 }
 

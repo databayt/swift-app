@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// ViewModel for Timetable feature
 /// Mirrors: Logic from content.tsx + role-based views
@@ -76,7 +77,7 @@ final class TimetableViewModel {
 
     // MARK: - Load Actions
 
-    /// Load weekly schedule
+    /// Load weekly schedule (offline-first)
     func loadWeeklySchedule() async {
         guard let schoolId = tenantContext?.schoolId else {
             viewState = .error(APIError.unauthorized)
@@ -93,10 +94,24 @@ final class TimetableViewModel {
             } else {
                 viewState = .loaded(response)
             }
+
+            // Cache to SwiftData
+            cacheTimetableEntries(response.entries, schoolId: schoolId)
         } catch {
-            viewState = .error(error)
-            self.error = error
-            showError = true
+            // Offline fallback: read from SwiftData
+            let cached = loadCachedTimetable(schoolId: schoolId)
+            if !cached.isEmpty {
+                let response = WeeklyScheduleResponse(
+                    entries: cached,
+                    termName: nil,
+                    className: nil
+                )
+                viewState = .loaded(response)
+            } else {
+                viewState = .error(error)
+                self.error = error
+                showError = true
+            }
         }
     }
 
@@ -175,5 +190,38 @@ final class TimetableViewModel {
     func toggleDisplayMode() {
         displayMode = displayMode == .week ? .day : .week
         Task { await refresh() }
+    }
+
+    // MARK: - SwiftData Cache
+
+    /// Cache timetable entries to SwiftData
+    private func cacheTimetableEntries(_ entries: [TimetableEntry], schoolId: String) {
+        let context = DataContainer.shared.modelContext
+        for entry in entries {
+            let entryId = entry.id
+            let descriptor = FetchDescriptor<TimetableModel>(
+                predicate: #Predicate { $0.id == entryId }
+            )
+            if let existing = try? context.fetch(descriptor).first {
+                existing.update(from: entry)
+                existing.lastSyncedAt = Date()
+            } else {
+                let model = TimetableModel(from: entry, schoolId: schoolId)
+                model.lastSyncedAt = Date()
+                context.insert(model)
+            }
+        }
+        try? context.save()
+    }
+
+    /// Load cached timetable from SwiftData
+    private func loadCachedTimetable(schoolId: String) -> [TimetableEntry] {
+        let context = DataContainer.shared.modelContext
+        let descriptor = FetchDescriptor<TimetableModel>(
+            predicate: #Predicate { $0.schoolId == schoolId },
+            sortBy: [SortDescriptor(\.dayOfWeek), SortDescriptor(\.startTime)]
+        )
+        guard let models = try? context.fetch(descriptor) else { return [] }
+        return models.map { TimetableEntry(from: $0) }
     }
 }

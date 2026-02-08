@@ -76,9 +76,47 @@ actor APIClient {
         let _: EmptyResponse = try await request(path, method: .delete)
     }
 
-    // MARK: - Core Request
+    // MARK: - Core Request (with transient error retry)
 
     private func request<T: Decodable>(
+        _ path: String,
+        method: HTTPMethod,
+        query: [String: String]? = nil,
+        body: (any Encodable)? = nil
+    ) async throws -> T {
+        let maxAttempts = 3
+        var lastError: Error?
+
+        for attempt in 0..<maxAttempts {
+            if attempt > 0 {
+                let delay = pow(2.0, Double(attempt - 1))
+                try? await Task.sleep(for: .seconds(delay))
+            }
+
+            do {
+                return try await performRequest(path, method: method, query: query, body: body)
+            } catch let error as APIError {
+                if case .serverError(let code) = error,
+                   [500, 502, 503].contains(code),
+                   attempt < maxAttempts - 1 {
+                    lastError = error
+                    continue
+                }
+                throw error
+            } catch {
+                if attempt < maxAttempts - 1,
+                   (error as NSError).domain == NSURLErrorDomain {
+                    lastError = error
+                    continue
+                }
+                throw error
+            }
+        }
+
+        throw lastError ?? APIError.unknown(0)
+    }
+
+    private func performRequest<T: Decodable>(
         _ path: String,
         method: HTTPMethod,
         query: [String: String]? = nil,

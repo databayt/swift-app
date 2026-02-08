@@ -5,11 +5,11 @@
 project: hogwarts-ios
 version: 1.0.0
 created_at: 2025-12-17
-updated_at: 2026-02-08
+updated_at: 2026-02-09
 
 # Current Position
 current_phase: implementation
-current_sprint: 6
+current_sprint: 7
 
 # BMAD Phases
 phases:
@@ -50,7 +50,7 @@ phases:
     status: in_progress
     started_at: 2026-02-08
     completed_at: null
-    current_sprint: 6
+    current_sprint: 7
 
 # Implementation Status (existing code)
 implementation_status:
@@ -528,6 +528,26 @@ sprints:
       - STORE-001
       - OFFLINE-003
       - TEST-001
+
+  - number: 7
+    name: Resilience & Full Offline Coverage
+    status: complete
+    started_at: 2026-02-08
+    completed_at: 2026-02-08
+    goals:
+      - PendingAction retry with exponential backoff (max 3 retries)
+      - APIClient automatic retry for transient errors (500/502/503)
+      - Offline-first reads for timetable, messages, notifications
+      - SwiftData VersionedSchema migration support
+      - Unit tests for sync engine, offline-first, API retry (~18 new)
+      - GitHub Actions CI/CD pipeline (build + test)
+    stories:
+      - SYNC-001
+      - API-001
+      - OFFLINE-004
+      - SCHEMA-001
+      - TEST-002
+      - CI-001
 
 # Blockers
 blockers: []

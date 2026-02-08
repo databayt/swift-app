@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// Type definitions for Messages feature
 /// Mirrors: src/components/platform/messages/types.ts
@@ -28,6 +29,24 @@ struct Conversation: Codable, Identifiable {
 
     var hasUnread: Bool {
         unreadCount > 0
+    }
+}
+
+// MARK: - SwiftData Conversion
+
+extension Conversation {
+    /// Initialize from SwiftData model (offline cache)
+    init(from model: ConversationModel) {
+        self.init(
+            id: model.id,
+            name: model.name,
+            isGroup: model.isGroup,
+            participants: [],
+            lastMessage: nil,
+            unreadCount: 0,
+            createdAt: model.createdAt,
+            updatedAt: model.updatedAt
+        )
     }
 }
 

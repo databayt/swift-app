@@ -89,6 +89,42 @@ final class TimetableModel {
         self.endTime = endTime
         self.schoolId = schoolId
     }
+
+    /// Convenience init from API response
+    convenience init(from entry: TimetableEntry, schoolId: String) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        let start = formatter.date(from: entry.startTime) ?? Date()
+        let end = formatter.date(from: entry.endTime) ?? Date()
+
+        self.init(
+            id: entry.id,
+            dayOfWeek: entry.dayOfWeek ?? 0,
+            startTime: start,
+            endTime: end,
+            schoolId: schoolId
+        )
+        self.subjectName = entry.subjectName
+        self.teacherName = entry.teacherName
+        self.classroomName = entry.classroomName
+    }
+
+    /// Update from API response
+    func update(from entry: TimetableEntry) {
+        self.dayOfWeek = entry.dayOfWeek ?? self.dayOfWeek
+        self.subjectName = entry.subjectName
+        self.teacherName = entry.teacherName
+        self.classroomName = entry.classroomName
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        if let start = formatter.date(from: entry.startTime) {
+            self.startTime = start
+        }
+        if let end = formatter.date(from: entry.endTime) {
+            self.endTime = end
+        }
+    }
 }
 
 // MARK: - Message Models
@@ -115,6 +151,22 @@ final class ConversationModel {
         self.isGroup = false
         self.createdAt = Date()
         self.updatedAt = Date()
+    }
+
+    /// Convenience init from API response
+    convenience init(from conversation: Conversation, schoolId: String) {
+        self.init(id: conversation.id, schoolId: schoolId)
+        self.name = conversation.name
+        self.isGroup = conversation.isGroup
+        self.createdAt = conversation.createdAt
+        self.updatedAt = conversation.updatedAt
+    }
+
+    /// Update from API response
+    func update(from conversation: Conversation) {
+        self.name = conversation.name
+        self.isGroup = conversation.isGroup
+        self.updatedAt = conversation.updatedAt
     }
 }
 
@@ -181,6 +233,33 @@ final class NotificationModel {
         self.schoolId = schoolId
         self.isRead = false
         self.createdAt = Date()
+    }
+
+    /// Convenience init from API response
+    convenience init(from notification: AppNotification) {
+        self.init(
+            id: notification.id,
+            userId: notification.userId,
+            type: notification.type,
+            title: notification.title,
+            message: notification.message,
+            schoolId: notification.schoolId
+        )
+        self.isRead = notification.isRead
+        self.createdAt = notification.createdAt
+        if let data = notification.data?.data(using: .utf8) {
+            self.data = data
+        }
+    }
+
+    /// Update from API response
+    func update(from notification: AppNotification) {
+        self.title = notification.title
+        self.message = notification.message
+        self.isRead = notification.isRead
+        if let data = notification.data?.data(using: .utf8) {
+            self.data = data
+        }
     }
 }
 

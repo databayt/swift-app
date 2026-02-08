@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// ViewModel for Notifications feature
 /// Mirrors: Logic from notifications/content.tsx
@@ -76,7 +77,7 @@ final class NotificationsViewModel {
 
     // MARK: - Load Actions
 
-    /// Load notifications
+    /// Load notifications (offline-first)
     func loadNotifications() async {
         guard let schoolId = tenantContext?.schoolId else {
             viewState = .error(APIError.unauthorized)
@@ -93,10 +94,19 @@ final class NotificationsViewModel {
             } else {
                 viewState = .loaded(notifications)
             }
+
+            // Cache to SwiftData
+            cacheNotifications(notifications, schoolId: schoolId)
         } catch {
-            viewState = .error(error)
-            self.error = error
-            showError = true
+            // Offline fallback: read from SwiftData
+            let cached = loadCachedNotifications(schoolId: schoolId)
+            if !cached.isEmpty {
+                viewState = .loaded(cached)
+            } else {
+                viewState = .error(error)
+                self.error = error
+                showError = true
+            }
         }
     }
 
@@ -202,5 +212,38 @@ final class NotificationsViewModel {
         if let observer = notificationObserver {
             NotificationCenter.default.removeObserver(observer)
         }
+    }
+
+    // MARK: - SwiftData Cache
+
+    /// Cache notifications to SwiftData
+    private func cacheNotifications(_ notifications: [AppNotification], schoolId: String) {
+        let context = DataContainer.shared.modelContext
+        for notif in notifications {
+            let notifId = notif.id
+            let descriptor = FetchDescriptor<NotificationModel>(
+                predicate: #Predicate { $0.id == notifId }
+            )
+            if let existing = try? context.fetch(descriptor).first {
+                existing.update(from: notif)
+                existing.lastSyncedAt = Date()
+            } else {
+                let model = NotificationModel(from: notif)
+                model.lastSyncedAt = Date()
+                context.insert(model)
+            }
+        }
+        try? context.save()
+    }
+
+    /// Load cached notifications from SwiftData
+    private func loadCachedNotifications(schoolId: String) -> [AppNotification] {
+        let context = DataContainer.shared.modelContext
+        let descriptor = FetchDescriptor<NotificationModel>(
+            predicate: #Predicate { $0.schoolId == schoolId },
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        guard let models = try? context.fetch(descriptor) else { return [] }
+        return models.map { AppNotification(from: $0) }
     }
 }
