@@ -97,6 +97,27 @@ final class AttendanceActions: Sendable {
         return try await api.get("/attendance/stats", query: params, as: AttendanceStats.self)
     }
 
+    /// Get students in a class
+    func getClassStudents(
+        classId: String,
+        schoolId: String
+    ) async throws -> [StudentInfo] {
+        return try await api.get(
+            "/classes/\(classId)/students",
+            query: ["schoolId": schoolId],
+            as: [StudentInfo].self
+        )
+    }
+
+    /// Get classes assigned to the current teacher
+    func getTeacherClasses(schoolId: String) async throws -> [TeacherClassItem] {
+        return try await api.get(
+            "/classes/teacher",
+            query: ["schoolId": schoolId],
+            as: [TeacherClassItem].self
+        )
+    }
+
     // MARK: - Write Actions
 
     /// Mark attendance for a single student

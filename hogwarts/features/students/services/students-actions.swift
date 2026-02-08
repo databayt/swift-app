@@ -45,6 +45,15 @@ final class StudentsActions: Sendable {
         return response.data
     }
 
+    /// Get year levels for a school
+    func getYearLevels(schoolId: String) async throws -> [YearLevel] {
+        return try await api.get(
+            "/year-levels",
+            query: ["schoolId": schoolId],
+            as: [YearLevel].self
+        )
+    }
+
     // MARK: - Write Actions
 
     /// Create new student

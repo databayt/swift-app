@@ -14,8 +14,10 @@ struct StudentsContent: View {
                 StudentsToolbar(
                     searchText: $searchText,
                     filters: $viewModel.filters,
+                    yearLevels: viewModel.yearLevels,
                     onSearch: { await viewModel.search(searchText) },
                     onFilter: { viewModel.filterByStatus($0) },
+                    onYearLevelFilter: { viewModel.filterByYearLevel($0) },
                     onCreate: { viewModel.showCreateForm() }
                 )
 
@@ -30,7 +32,8 @@ struct StudentsContent: View {
                             rows: viewModel.rows,
                             onSelect: { row in
                                 if let student = viewModel.students.first(where: { $0.id == row.id }) {
-                                    viewModel.showEditForm(for: student)
+                                    viewModel.detailStudent = student
+                                    viewModel.isNavigatingToDetail = true
                                 }
                             },
                             onDelete: { rows in
@@ -78,6 +81,7 @@ struct StudentsContent: View {
             .sheet(isPresented: $viewModel.isShowingForm) {
                 StudentsForm(
                     mode: viewModel.formMode,
+                    yearLevels: viewModel.yearLevels,
                     onSubmit: { request in
                         Task {
                             await viewModel.submitForm(request)
@@ -97,6 +101,17 @@ struct StudentsContent: View {
             } message: { error in
                 Text(error.localizedDescription)
             }
+            .navigationDestination(isPresented: $viewModel.isNavigatingToDetail) {
+                if let student = viewModel.detailStudent {
+                    StudentDetailView(
+                        student: student,
+                        yearLevels: viewModel.yearLevels,
+                        onEdit: { student in
+                            viewModel.showEditForm(for: student)
+                        }
+                    )
+                }
+            }
             .task {
                 viewModel.setup(tenantContext: tenantContext)
                 await viewModel.loadStudents()
@@ -110,8 +125,10 @@ struct StudentsContent: View {
 struct StudentsToolbar: View {
     @Binding var searchText: String
     @Binding var filters: StudentFilters
+    let yearLevels: [YearLevel]
     let onSearch: () async -> Void
     let onFilter: (StudentStatus?) -> Void
+    let onYearLevelFilter: (String?) -> Void
     let onCreate: () -> Void
 
     var body: some View {
@@ -142,7 +159,28 @@ struct StudentsToolbar: View {
             .background(.quaternary)
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            // Filter chips
+            // Year level filter
+            if !yearLevels.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        FilterChip(
+                            title: String(localized: "filter.allYearLevels"),
+                            isSelected: filters.yearLevelId == nil,
+                            action: { onYearLevelFilter(nil) }
+                        )
+
+                        ForEach(yearLevels) { yearLevel in
+                            FilterChip(
+                                title: yearLevel.name,
+                                isSelected: filters.yearLevelId == yearLevel.id,
+                                action: { onYearLevelFilter(yearLevel.id) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Status filter chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     FilterChip(

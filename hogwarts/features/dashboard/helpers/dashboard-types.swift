@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 /// Dashboard data types shared across role-specific dashboards
 /// Mirrors: src/components/platform/dashboard/types.ts
@@ -94,4 +94,59 @@ struct DashboardMessagePreview: Codable, Identifiable {
     let preview: String
     let date: String
     let isRead: Bool
+}
+
+// MARK: - Admin Dashboard
+
+struct AdminDashboardStats: Codable {
+    let studentCount: Int
+    let teacherCount: Int
+    let attendanceRate: Double
+    let averageGrade: Double
+}
+
+struct AdminTodayAttendance: Codable {
+    let totalStudents: Int
+    let presentCount: Int
+    let absentCount: Int
+    let lateCount: Int
+    let rate: Double
+}
+
+struct AdminGradePerformance: Codable {
+    let averageScore: Double
+    let passRate: Double
+    let excellentCount: Int
+    let goodCount: Int
+    let averageCount: Int
+    let failCount: Int
+}
+
+struct AdminActivityItem: Codable, Identifiable {
+    let id: String
+    let type: String  // enrollment, attendance, grade, announcement
+    let title: String
+    let description: String
+    let timestamp: String
+    let icon: String?
+
+    var activityIcon: String {
+        switch type {
+        case "enrollment": return "person.badge.plus"
+        case "attendance": return "checkmark.circle"
+        case "grade": return "chart.bar"
+        case "announcement": return "megaphone"
+        default: return "circle"
+        }
+    }
+
+    var activityColor: Color {
+        switch type {
+        case "enrollment": return .blue
+        case "attendance": return .green
+        case "grade": return .purple
+        case "announcement": return .orange
+        default: return .gray
+        }
+    }
 }

@@ -42,14 +42,26 @@ struct AttendanceContent: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     if viewModel.capabilities.canMarkAttendance {
                         Menu {
-                            Button {
-                                viewModel.showMarkClassForm(classId: "")
-                            } label: {
-                                Label(
-                                    String(localized: "attendance.action.markClass"),
-                                    systemImage: "person.3"
-                                )
+                            if viewModel.teacherClasses.isEmpty {
+                                Button {
+                                    viewModel.showMarkClassForm(classId: viewModel.selectedClassId ?? "")
+                                } label: {
+                                    Label(
+                                        String(localized: "attendance.action.markClass"),
+                                        systemImage: "person.3"
+                                    )
+                                }
+                            } else {
+                                ForEach(viewModel.teacherClasses) { cls in
+                                    Button {
+                                        viewModel.showMarkClassForm(classId: cls.id)
+                                    } label: {
+                                        Label(cls.displayName, systemImage: "person.3")
+                                    }
+                                }
                             }
+
+                            Divider()
 
                             Button {
                                 viewModel.showMarkForm(studentId: "")
@@ -114,6 +126,7 @@ struct AttendanceContent: View {
                 viewModel.setup(tenantContext: tenantContext, authManager: authManager)
                 await viewModel.loadAttendanceForDate(viewModel.selectedDate)
                 await viewModel.loadStats()
+                await viewModel.loadTeacherClasses()
             }
         }
     }
@@ -126,6 +139,24 @@ struct TeacherAttendanceContent: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Class selector
+            if !viewModel.teacherClasses.isEmpty {
+                Picker(String(localized: "attendance.class"), selection: Binding(
+                    get: { viewModel.selectedClassId ?? "" },
+                    set: { newValue in
+                        viewModel.selectedClassId = newValue
+                        viewModel.filterByClass(newValue.isEmpty ? nil : newValue)
+                    }
+                )) {
+                    Text(String(localized: "filter.allClasses")).tag("")
+                    ForEach(viewModel.teacherClasses) { cls in
+                        Text(cls.displayName).tag(cls.id)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+            }
+
             // Stats summary (if viewing student)
             if viewModel.filters.studentId != nil, let stats = viewModel.statsDisplay {
                 AttendanceStatsBar(stats: stats)
@@ -180,6 +211,25 @@ struct TeacherAttendanceContent: View {
 
 struct StudentAttendanceContent: View {
     @Bindable var viewModel: AttendanceViewModel
+    @State private var displayMode: AttendanceDisplayMode = .list
+
+    enum AttendanceDisplayMode: String, CaseIterable {
+        case list, calendar
+
+        var label: String {
+            switch self {
+            case .list: return String(localized: "attendance.view.list")
+            case .calendar: return String(localized: "attendance.view.calendar")
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .list: return "list.bullet"
+            case .calendar: return "calendar"
+            }
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -189,21 +239,45 @@ struct StudentAttendanceContent: View {
                     .padding()
             }
 
-            // History
+            // Display mode picker
+            Picker(String(localized: "attendance.view.mode"), selection: $displayMode) {
+                ForEach(AttendanceDisplayMode.allCases, id: \.self) { mode in
+                    Label(mode.label, systemImage: mode.icon)
+                        .tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+
+            // History (list or calendar)
             Group {
                 switch viewModel.viewState {
                 case .idle, .loading:
                     LoadingView()
 
                 case .loaded:
-                    List {
-                        ForEach(viewModel.rows) { row in
-                            AttendanceHistoryRow(row: row)
+                    if displayMode == .calendar {
+                        ScrollView {
+                            AttendanceCalendarView(
+                                rows: viewModel.rows,
+                                selectedDate: $viewModel.selectedDate
+                            )
+                            .padding(.vertical)
                         }
-                    }
-                    .listStyle(.plain)
-                    .refreshable {
-                        await viewModel.refresh()
+                        .refreshable {
+                            await viewModel.refresh()
+                        }
+                    } else {
+                        List {
+                            ForEach(viewModel.rows) { row in
+                                AttendanceHistoryRow(row: row)
+                            }
+                        }
+                        .listStyle(.plain)
+                        .refreshable {
+                            await viewModel.refresh()
+                        }
                     }
 
                 case .empty:

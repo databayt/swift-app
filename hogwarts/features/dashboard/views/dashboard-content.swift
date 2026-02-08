@@ -65,27 +65,14 @@ struct DashboardContent: View {
         case .guardian:
             GuardianDashboard()
         case .admin, .developer:
-            AdminDashboardContent()
+            AdminDashboard()
         default:
             DefaultDashboardContent()
         }
     }
 }
 
-// MARK: - Placeholder Views (Admin/Default — Sprint 2)
-
-struct AdminDashboardContent: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            DashboardCard(
-                title: String(localized: "dashboard.schoolOverview"),
-                systemImage: "building.2"
-            ) {
-                Text("School metrics")
-            }
-        }
-    }
-}
+// MARK: - Placeholder Views (Default — Sprint 2)
 
 struct DefaultDashboardContent: View {
     var body: some View {

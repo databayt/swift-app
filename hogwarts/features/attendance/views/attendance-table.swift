@@ -249,8 +249,14 @@ struct AttendanceCalendarView: View {
     let rows: [AttendanceRow]
     @Binding var selectedDate: Date
 
+    private let calendar = Calendar.current
+    private let weekdays: [String] = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        return formatter.veryShortWeekdaySymbols
+    }()
+
     private var attendanceByDate: [Date: AttendanceStatus] {
-        let calendar = Calendar.current
         var result: [Date: AttendanceStatus] = [:]
         for row in rows {
             let day = calendar.startOfDay(for: row.date)
@@ -259,12 +265,30 @@ struct AttendanceCalendarView: View {
         return result
     }
 
+    private var monthDays: [Date?] {
+        guard let range = calendar.range(of: .day, in: .month, for: selectedDate),
+              let firstOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: selectedDate)) else {
+            return []
+        }
+
+        let firstWeekday = calendar.component(.weekday, from: firstOfMonth) - calendar.firstWeekday
+        let offset = firstWeekday >= 0 ? firstWeekday : firstWeekday + 7
+
+        var days: [Date?] = Array(repeating: nil, count: offset)
+        for day in range {
+            if let date = calendar.date(byAdding: .day, value: day - 1, to: firstOfMonth) {
+                days.append(date)
+            }
+        }
+        return days
+    }
+
     var body: some View {
         VStack(spacing: 16) {
             // Month header
             HStack {
                 Button {
-                    selectedDate = Calendar.current.date(
+                    selectedDate = calendar.date(
                         byAdding: .month,
                         value: -1,
                         to: selectedDate
@@ -281,7 +305,7 @@ struct AttendanceCalendarView: View {
                 Spacer()
 
                 Button {
-                    selectedDate = Calendar.current.date(
+                    selectedDate = calendar.date(
                         byAdding: .month,
                         value: 1,
                         to: selectedDate
@@ -292,20 +316,90 @@ struct AttendanceCalendarView: View {
             }
             .padding(.horizontal)
 
+            // Weekday headers
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 4) {
+                ForEach(weekdays, id: \.self) { day in
+                    Text(day)
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.horizontal)
+
+            // Calendar grid
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
+                ForEach(Array(monthDays.enumerated()), id: \.offset) { _, date in
+                    if let date = date {
+                        CalendarDayCell(
+                            date: date,
+                            status: attendanceByDate[calendar.startOfDay(for: date)],
+                            isToday: calendar.isDateInToday(date)
+                        )
+                    } else {
+                        Color.clear
+                            .frame(height: 36)
+                    }
+                }
+            }
+            .padding(.horizontal)
+
             // Legend
             HStack(spacing: 16) {
                 LegendItem(color: .green, label: AttendanceStatus.present.displayName)
                 LegendItem(color: .red, label: AttendanceStatus.absent.displayName)
                 LegendItem(color: .orange, label: AttendanceStatus.late.displayName)
+                LegendItem(color: .blue, label: AttendanceStatus.excused.displayName)
             }
             .font(.caption)
+        }
+    }
+}
 
-            // Calendar grid would go here
-            // This is a simplified version - full implementation would need a calendar grid
-            Text(String(localized: "attendance.calendar.placeholder"))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding()
+struct CalendarDayCell: View {
+    let date: Date
+    let status: AttendanceStatus?
+    let isToday: Bool
+
+    private var dayNumber: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter.string(from: date)
+    }
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(dayNumber)
+                .font(.caption)
+                .fontWeight(isToday ? .bold : .regular)
+                .foregroundStyle(isToday ? .white : .primary)
+
+            if let status = status {
+                Circle()
+                    .fill(statusColor(status))
+                    .frame(width: 6, height: 6)
+            } else {
+                Circle()
+                    .fill(.clear)
+                    .frame(width: 6, height: 6)
+            }
+        }
+        .frame(height: 36)
+        .frame(maxWidth: .infinity)
+        .background(
+            isToday ? Color.accentColor : Color.clear
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+
+    private func statusColor(_ status: AttendanceStatus) -> Color {
+        switch status {
+        case .present: return .green
+        case .absent: return .red
+        case .late: return .orange
+        case .excused: return .blue
+        case .sick: return .purple
+        case .holiday: return .gray
         }
     }
 }

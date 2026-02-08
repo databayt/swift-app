@@ -15,6 +15,10 @@ final class StudentsViewModel {
     var selectedStudent: Student?
     var isShowingForm = false
     var formMode: StudentFormMode = .create
+    var yearLevels: [YearLevel] = []
+    var selectedYearLevelId: String?
+    var isNavigatingToDetail = false
+    var detailStudent: Student?
 
     // Pagination
     var currentPage = 1
@@ -47,6 +51,7 @@ final class StudentsViewModel {
 
     func setup(tenantContext: TenantContext) {
         self.tenantContext = tenantContext
+        Task { await loadYearLevels() }
     }
 
     // MARK: - Actions
@@ -125,6 +130,17 @@ final class StudentsViewModel {
         filters = StudentFilters()
         currentPage = 1
         Task { await loadStudents() }
+    }
+
+    /// Load year levels for filter
+    func loadYearLevels() async {
+        guard let schoolId = tenantContext?.schoolId else { return }
+        do {
+            yearLevels = try await actions.getYearLevels(schoolId: schoolId)
+        } catch {
+            // Year levels are non-critical, don't show error
+            print("Failed to load year levels: \(error)")
+        }
     }
 
     // MARK: - CRUD Actions

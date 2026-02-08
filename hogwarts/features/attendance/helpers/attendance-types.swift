@@ -356,3 +356,18 @@ struct AttendanceCapabilities {
         }
     }
 }
+
+// MARK: - Teacher Class Types
+
+/// Info about a class assigned to a teacher
+struct TeacherClassItem: Codable, Identifiable {
+    let id: String
+    let name: String
+    let nameAr: String?
+    let yearLevel: String?
+    let studentCount: Int
+
+    var displayName: String {
+        nameAr ?? name
+    }
+}

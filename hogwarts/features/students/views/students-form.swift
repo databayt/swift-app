@@ -4,6 +4,7 @@ import SwiftUI
 /// Mirrors: src/components/platform/students/form.tsx
 struct StudentsForm: View {
     let mode: StudentFormMode
+    let yearLevels: [YearLevel]
     let onSubmit: (StudentCreateRequest) -> Void
     let onCancel: () -> Void
 
@@ -132,6 +133,16 @@ struct StudentsForm: View {
                         title: String(localized: "student.form.nationality"),
                         text: $nationality
                     )
+
+                    // Year Level picker
+                    if !yearLevels.isEmpty {
+                        Picker(String(localized: "student.form.yearLevel"), selection: $yearLevelId) {
+                            Text(String(localized: "common.select")).tag(nil as String?)
+                            ForEach(yearLevels) { level in
+                                Text(level.name).tag(level.id as String?)
+                            }
+                        }
+                    }
                 }
             }
             .navigationTitle(mode.title)
@@ -288,6 +299,7 @@ struct ValidatedTextField: View {
 #Preview("Create") {
     StudentsForm(
         mode: .create,
+        yearLevels: [],
         onSubmit: { _ in },
         onCancel: {}
     )

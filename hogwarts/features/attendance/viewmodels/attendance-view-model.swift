@@ -32,6 +32,10 @@ final class AttendanceViewModel {
     var isShowingExcuseForm = false
     var selectedExcuse: AttendanceExcuse?
 
+    // Teacher classes
+    var teacherClasses: [TeacherClassItem] = []
+    var selectedClassId: String?
+
     // Pagination
     var currentPage = 1
     var totalPages = 1
@@ -161,10 +165,13 @@ final class AttendanceViewModel {
                 schoolId: schoolId
             )
 
-            // For now, create mock data - in real app, fetch students from class
-            // This would need a separate API call to get class students
-            let students: [StudentInfo] = []
-            let classInfo = ClassInfo(id: classId, name: "Class", nameAr: nil)
+            let students = try await actions.getClassStudents(classId: classId, schoolId: schoolId)
+            let classInfo: ClassInfo
+            if let teacherClass = teacherClasses.first(where: { $0.id == classId }) {
+                classInfo = ClassInfo(id: classId, name: teacherClass.name, nameAr: teacherClass.nameAr)
+            } else {
+                classInfo = ClassInfo(id: classId, name: "Class", nameAr: nil)
+            }
 
             let data = ClassAttendanceState.ClassAttendanceData(
                 classInfo: classInfo,
@@ -199,6 +206,23 @@ final class AttendanceViewModel {
         } catch {
             self.error = error
             showError = true
+        }
+    }
+
+    /// Load teacher's assigned classes
+    func loadTeacherClasses() async {
+        guard let schoolId = tenantContext?.schoolId,
+              capabilities.canMarkAttendance else {
+            return
+        }
+
+        do {
+            teacherClasses = try await actions.getTeacherClasses(schoolId: schoolId)
+            if selectedClassId == nil, let first = teacherClasses.first {
+                selectedClassId = first.id
+            }
+        } catch {
+            print("Failed to load teacher classes: \(error)")
         }
     }
 
