@@ -50,6 +50,34 @@ final class AttendanceModel {
         self.method = method?.rawValue
         self.markedAt = Date()
     }
+
+    /// Convenience init from API response
+    convenience init(from attendance: Attendance, schoolId: String) {
+        self.init(
+            id: attendance.id,
+            studentId: attendance.studentId,
+            date: attendance.date,
+            status: attendance.attendanceStatus,
+            schoolId: schoolId,
+            method: attendance.attendanceMethod
+        )
+        self.classId = attendance.classId
+        self.periodId = attendance.periodId
+        self.notes = attendance.notes
+        self.markedById = attendance.markedById
+        self.markedAt = attendance.markedAt
+    }
+
+    /// Update from API response
+    func update(from attendance: Attendance) {
+        self.status = attendance.status
+        self.method = attendance.method
+        self.classId = attendance.classId
+        self.periodId = attendance.periodId
+        self.notes = attendance.notes
+        self.markedById = attendance.markedById
+        self.markedAt = attendance.markedAt
+    }
 }
 
 // MARK: - Attendance Status

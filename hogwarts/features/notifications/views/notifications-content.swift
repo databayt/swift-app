@@ -5,6 +5,7 @@ import SwiftUI
 struct NotificationsContent: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(TenantContext.self) private var tenantContext
+    @Environment(NotificationNavigationState.self) private var navigationState
     @State private var viewModel = NotificationsViewModel()
 
     var body: some View {
@@ -158,6 +159,11 @@ struct NotificationsContent: View {
             .task {
                 viewModel.setup(tenantContext: tenantContext, authManager: authManager)
                 await viewModel.loadNotifications()
+
+                // Handle deep link from push notification
+                if case .announcement(_) = navigationState.pendingDestination {
+                    navigationState.clearPending()
+                }
             }
         }
     }

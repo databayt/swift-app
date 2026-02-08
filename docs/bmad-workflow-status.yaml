@@ -9,7 +9,7 @@ updated_at: 2026-02-08
 
 # Current Position
 current_phase: implementation
-current_sprint: 5
+current_sprint: 6
 
 # BMAD Phases
 phases:
@@ -50,7 +50,7 @@ phases:
     status: in_progress
     started_at: 2026-02-08
     completed_at: null
-    current_sprint: 5
+    current_sprint: 6
 
 # Implementation Status (existing code)
 implementation_status:
@@ -507,6 +507,27 @@ sprints:
       - POLISH-008
       - POLISH-009
       - POLISH-010
+
+  - number: 6
+    name: Offline-First & Production Readiness
+    status: complete
+    started_at: 2026-02-08
+    completed_at: 2026-02-08
+    goals:
+      - SwiftData sync (students, attendance, grades)
+      - Offline-first ViewModel reads with cache fallback
+      - Deep link navigation from push notifications
+      - App icon (1024x1024)
+      - SwiftLint configuration
+      - Last-synced indicator in offline banner
+      - UI tests for critical flows (9 tests)
+    stories:
+      - OFFLINE-001
+      - OFFLINE-002
+      - NAV-001
+      - STORE-001
+      - OFFLINE-003
+      - TEST-001
 
 # Blockers
 blockers: []

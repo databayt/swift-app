@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import os
 
 /// ViewModel for Attendance feature
@@ -91,7 +92,7 @@ final class AttendanceViewModel {
 
     // MARK: - Load Actions
 
-    /// Load attendance records with current filters
+    /// Load attendance records with current filters (offline-first)
     func loadAttendance() async {
         guard let schoolId = tenantContext?.schoolId else {
             viewState = .error(AttendanceError.unauthorized)
@@ -120,10 +121,20 @@ final class AttendanceViewModel {
 
             totalPages = response.totalPages
             totalCount = response.total
+
+            // Cache to SwiftData
+            cacheAttendance(response.data, schoolId: schoolId)
         } catch {
-            viewState = .error(error)
-            self.error = error
-            showError = true
+            // Offline fallback: read from SwiftData
+            let cached = loadCachedAttendance(schoolId: schoolId)
+            if !cached.isEmpty {
+                viewState = .loaded(cached)
+                totalCount = cached.count
+            } else {
+                viewState = .error(error)
+                self.error = error
+                showError = true
+            }
         }
     }
 
@@ -518,6 +529,40 @@ final class AttendanceViewModel {
             showError = true
             return false
         }
+    }
+
+    // MARK: - SwiftData Cache
+
+    /// Cache attendance to SwiftData
+    private func cacheAttendance(_ records: [Attendance], schoolId: String) {
+        let context = DataContainer.shared.modelContext
+        for record in records {
+            let recordId = record.id
+            let descriptor = FetchDescriptor<AttendanceModel>(
+                predicate: #Predicate { $0.id == recordId }
+            )
+            if let existing = try? context.fetch(descriptor).first {
+                existing.update(from: record)
+                existing.lastSyncedAt = Date()
+            } else {
+                let model = AttendanceModel(from: record, schoolId: schoolId)
+                model.lastSyncedAt = Date()
+                context.insert(model)
+            }
+        }
+        try? context.save()
+    }
+
+    /// Load cached attendance from SwiftData
+    private func loadCachedAttendance(schoolId: String) -> [Attendance] {
+        let context = DataContainer.shared.modelContext
+        var descriptor = FetchDescriptor<AttendanceModel>(
+            predicate: #Predicate { $0.schoolId == schoolId },
+            sortBy: [SortDescriptor(\.date, order: .reverse)]
+        )
+        descriptor.fetchLimit = 100
+        guard let models = try? context.fetch(descriptor) else { return [] }
+        return models.map { Attendance(from: $0) }
     }
 
     // MARK: - Helpers

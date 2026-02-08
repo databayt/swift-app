@@ -70,6 +70,55 @@ final class StudentModel {
         self.schoolId = schoolId
         self.status = status.rawValue
     }
+
+    /// Convenience init from API response
+    convenience init(from student: Student, schoolId: String) {
+        self.init(
+            id: student.id,
+            grNumber: student.grNumber,
+            userId: student.userId,
+            schoolId: schoolId,
+            status: student.studentStatus
+        )
+        self.yearLevelId = student.yearLevelId
+        self.batchId = student.batchId
+        self.givenName = student.givenName
+        self.surname = student.surname
+        self.givenNameAr = student.givenNameAr
+        self.surnameAr = student.surnameAr
+        self.dateOfBirth = student.dateOfBirth
+        self.gender = student.gender
+        self.nationality = student.nationality
+        self.photoUrl = student.photoUrl
+        self.email = student.email
+        self.phone = student.phone
+        self.address = student.address
+        self.bloodType = student.bloodType
+        self.allergies = student.allergies
+        self.medicalConditions = student.medicalConditions
+    }
+
+    /// Update from API response
+    func update(from student: Student) {
+        self.grNumber = student.grNumber
+        self.status = student.status
+        self.yearLevelId = student.yearLevelId
+        self.batchId = student.batchId
+        self.givenName = student.givenName
+        self.surname = student.surname
+        self.givenNameAr = student.givenNameAr
+        self.surnameAr = student.surnameAr
+        self.dateOfBirth = student.dateOfBirth
+        self.gender = student.gender
+        self.nationality = student.nationality
+        self.photoUrl = student.photoUrl
+        self.email = student.email
+        self.phone = student.phone
+        self.address = student.address
+        self.bloodType = student.bloodType
+        self.allergies = student.allergies
+        self.medicalConditions = student.medicalConditions
+    }
 }
 
 // MARK: - Enums

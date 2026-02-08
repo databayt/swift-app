@@ -147,15 +147,146 @@ actor SyncEngine {
     // MARK: - Entity Sync Methods
 
     private func syncStudents() async {
-        // Implementation will fetch from API and update SwiftData
+        await MainActor.run {
+            let context = DataContainer.shared.modelContext
+
+            let userDescriptor = FetchDescriptor<UserModel>(
+                sortBy: [SortDescriptor(\.lastSyncedAt, order: .reverse)]
+            )
+            guard let user = try? context.fetch(userDescriptor).first,
+                  let schoolId = user.schoolId else { return }
+
+            Task {
+                do {
+                    let response: StudentsResponse = try await api.get(
+                        "/students",
+                        query: ["schoolId": schoolId, "pageSize": "500"],
+                        as: StudentsResponse.self
+                    )
+
+                    await MainActor.run {
+                        for student in response.data {
+                            let studentId = student.id
+                            let descriptor = FetchDescriptor<StudentModel>(
+                                predicate: #Predicate { $0.id == studentId }
+                            )
+
+                            if let existing = try? context.fetch(descriptor).first {
+                                existing.update(from: student)
+                                existing.lastSyncedAt = Date()
+                            } else {
+                                let model = StudentModel(from: student, schoolId: schoolId)
+                                model.lastSyncedAt = Date()
+                                context.insert(model)
+                            }
+                        }
+
+                        try? context.save()
+                        updateSyncMetadata(entityType: "students", context: context)
+                    }
+                } catch {
+                    // Non-critical — will retry on next sync
+                }
+            }
+        }
     }
 
     private func syncAttendance() async {
-        // Implementation will fetch from API and update SwiftData
+        await MainActor.run {
+            let context = DataContainer.shared.modelContext
+
+            let userDescriptor = FetchDescriptor<UserModel>(
+                sortBy: [SortDescriptor(\.lastSyncedAt, order: .reverse)]
+            )
+            guard let user = try? context.fetch(userDescriptor).first,
+                  let schoolId = user.schoolId else { return }
+
+            Task {
+                do {
+                    // Fetch last 30 days of attendance
+                    let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
+                    let dateFrom = ISO8601DateFormatter().string(from: thirtyDaysAgo)
+
+                    let response: AttendanceResponse = try await api.get(
+                        "/attendance",
+                        query: [
+                            "schoolId": schoolId,
+                            "dateFrom": dateFrom,
+                            "pageSize": "500"
+                        ],
+                        as: AttendanceResponse.self
+                    )
+
+                    await MainActor.run {
+                        for record in response.data {
+                            let recordId = record.id
+                            let descriptor = FetchDescriptor<AttendanceModel>(
+                                predicate: #Predicate { $0.id == recordId }
+                            )
+
+                            if let existing = try? context.fetch(descriptor).first {
+                                existing.update(from: record)
+                                existing.lastSyncedAt = Date()
+                            } else {
+                                let model = AttendanceModel(from: record, schoolId: schoolId)
+                                model.lastSyncedAt = Date()
+                                context.insert(model)
+                            }
+                        }
+
+                        try? context.save()
+                        updateSyncMetadata(entityType: "attendance", context: context)
+                    }
+                } catch {
+                    // Non-critical — will retry on next sync
+                }
+            }
+        }
     }
 
     private func syncGrades() async {
-        // Implementation will fetch from API and update SwiftData
+        await MainActor.run {
+            let context = DataContainer.shared.modelContext
+
+            let userDescriptor = FetchDescriptor<UserModel>(
+                sortBy: [SortDescriptor(\.lastSyncedAt, order: .reverse)]
+            )
+            guard let user = try? context.fetch(userDescriptor).first,
+                  let schoolId = user.schoolId else { return }
+
+            Task {
+                do {
+                    let response: ExamResultsResponse = try await api.get(
+                        "/grades/results",
+                        query: ["schoolId": schoolId, "pageSize": "500"],
+                        as: ExamResultsResponse.self
+                    )
+
+                    await MainActor.run {
+                        for result in response.data {
+                            let resultId = result.id
+                            let descriptor = FetchDescriptor<ExamResultModel>(
+                                predicate: #Predicate { $0.id == resultId }
+                            )
+
+                            if let existing = try? context.fetch(descriptor).first {
+                                existing.update(from: result)
+                                existing.lastSyncedAt = Date()
+                            } else {
+                                let model = ExamResultModel(from: result, schoolId: schoolId)
+                                model.lastSyncedAt = Date()
+                                context.insert(model)
+                            }
+                        }
+
+                        try? context.save()
+                        updateSyncMetadata(entityType: "grades", context: context)
+                    }
+                } catch {
+                    // Non-critical — will retry on next sync
+                }
+            }
+        }
     }
 
     private func syncMessages() async {
@@ -180,8 +311,9 @@ actor SyncEngine {
 
                     await MainActor.run {
                         for conv in conversations {
+                            let convId = conv.id
                             let descriptor = FetchDescriptor<ConversationModel>(
-                                predicate: #Predicate { $0.id == conv.id }
+                                predicate: #Predicate { $0.id == convId }
                             )
 
                             if let existing = try? context.fetch(descriptor).first {
@@ -198,6 +330,7 @@ actor SyncEngine {
                         }
 
                         try? context.save()
+                        updateSyncMetadata(entityType: "messages", context: context)
                     }
                 } catch {
                     // Non-critical — will retry on next sync
@@ -228,8 +361,9 @@ actor SyncEngine {
 
                     await MainActor.run {
                         for notif in notifications {
+                            let notifId = notif.id
                             let descriptor = FetchDescriptor<NotificationModel>(
-                                predicate: #Predicate { $0.id == notif.id }
+                                predicate: #Predicate { $0.id == notifId }
                             )
 
                             if let existing = try? context.fetch(descriptor).first {
@@ -251,12 +385,33 @@ actor SyncEngine {
                         }
 
                         try? context.save()
+                        updateSyncMetadata(entityType: "notifications", context: context)
                     }
                 } catch {
                     // Non-critical — will retry on next sync
                 }
             }
         }
+    }
+    // MARK: - Sync Metadata Helper
+
+    @MainActor
+    private func updateSyncMetadata(entityType: String, context: ModelContext) {
+        let descriptor = FetchDescriptor<SyncMetadata>(
+            predicate: #Predicate { $0.entityType == entityType }
+        )
+
+        if let existing = try? context.fetch(descriptor).first {
+            existing.lastSyncedAt = Date()
+            existing.syncVersion += 1
+        } else {
+            let metadata = SyncMetadata(entityType: entityType)
+            metadata.lastSyncedAt = Date()
+            metadata.syncVersion = 1
+            context.insert(metadata)
+        }
+
+        try? context.save()
     }
 }
 

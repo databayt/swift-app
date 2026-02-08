@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// ViewModel for Grades feature
 /// Mirrors: Logic from content.tsx + role-based views
@@ -72,7 +73,7 @@ final class GradesViewModel {
 
     // MARK: - Load Actions
 
-    /// Load exam results based on role
+    /// Load exam results based on role (offline-first)
     func loadResults() async {
         guard let schoolId = tenantContext?.schoolId else {
             viewState = .error(GradesError.unauthorized)
@@ -105,14 +106,24 @@ final class GradesViewModel {
             totalPages = response.totalPages
             totalCount = response.total
 
+            // Cache to SwiftData
+            cacheResults(response.data, schoolId: schoolId)
+
             // Auto-load report card for student/guardian roles (for GPA card)
             if !capabilities.canEnterGrades && reportCard == nil {
                 await loadReportCard()
             }
         } catch {
-            viewState = .error(error)
-            self.error = error
-            showError = true
+            // Offline fallback: read from SwiftData
+            let cached = loadCachedResults(schoolId: schoolId)
+            if !cached.isEmpty {
+                viewState = .loaded(cached)
+                totalCount = cached.count
+            } else {
+                viewState = .error(error)
+                self.error = error
+                showError = true
+            }
         }
     }
 
@@ -256,6 +267,38 @@ final class GradesViewModel {
     func showReportCard(studentId: String? = nil) {
         isShowingReportCard = true
         Task { await loadReportCard(studentId: studentId) }
+    }
+
+    // MARK: - SwiftData Cache
+
+    /// Cache results to SwiftData
+    private func cacheResults(_ results: [ExamResult], schoolId: String) {
+        let context = DataContainer.shared.modelContext
+        for result in results {
+            let resultId = result.id
+            let descriptor = FetchDescriptor<ExamResultModel>(
+                predicate: #Predicate { $0.id == resultId }
+            )
+            if let existing = try? context.fetch(descriptor).first {
+                existing.update(from: result)
+                existing.lastSyncedAt = Date()
+            } else {
+                let model = ExamResultModel(from: result, schoolId: schoolId)
+                model.lastSyncedAt = Date()
+                context.insert(model)
+            }
+        }
+        try? context.save()
+    }
+
+    /// Load cached results from SwiftData
+    private func loadCachedResults(schoolId: String) -> [ExamResult] {
+        let context = DataContainer.shared.modelContext
+        let descriptor = FetchDescriptor<ExamResultModel>(
+            predicate: #Predicate { $0.schoolId == schoolId }
+        )
+        guard let models = try? context.fetch(descriptor) else { return [] }
+        return models.map { ExamResult(from: $0) }
     }
 
     // MARK: - Helpers

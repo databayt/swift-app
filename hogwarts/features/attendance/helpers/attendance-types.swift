@@ -121,6 +121,33 @@ struct ExcuseFilters {
     var pageSize: Int = 20
 }
 
+// MARK: - SwiftData Conversion
+
+extension Attendance {
+    /// Create API model from SwiftData model (for offline reads)
+    init(from model: AttendanceModel) {
+        self.init(
+            id: model.id,
+            studentId: model.studentId,
+            classId: model.classId,
+            periodId: model.periodId,
+            date: model.date,
+            status: model.status,
+            method: model.method,
+            notes: model.notes,
+            schoolId: model.schoolId,
+            markedById: model.markedById,
+            markedAt: model.markedAt,
+            createdAt: nil,
+            updatedAt: nil,
+            student: nil,
+            class_: nil,
+            period: nil,
+            markedBy: nil
+        )
+    }
+}
+
 // MARK: - View State
 
 /// Attendance list view state

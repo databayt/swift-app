@@ -31,6 +31,28 @@ final class ExamResultModel {
         self.examId = examId
         self.schoolId = schoolId
     }
+
+    /// Convenience init from API response
+    convenience init(from result: ExamResult, schoolId: String) {
+        self.init(
+            id: result.id,
+            studentId: result.studentId,
+            examId: result.examId,
+            schoolId: schoolId
+        )
+        self.marks = result.marks
+        self.grade = result.grade
+        self.percentage = result.percentage
+        self.remarks = result.remarks
+    }
+
+    /// Update from API response
+    func update(from result: ExamResult) {
+        self.marks = result.marks
+        self.grade = result.grade
+        self.percentage = result.percentage
+        self.remarks = result.remarks
+    }
 }
 
 // MARK: - Timetable Model

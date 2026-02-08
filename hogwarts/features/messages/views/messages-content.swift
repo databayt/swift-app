@@ -5,7 +5,9 @@ import SwiftUI
 struct MessagesContent: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(TenantContext.self) private var tenantContext
+    @Environment(NotificationNavigationState.self) private var navigationState
     @State private var viewModel = MessagesViewModel()
+    @State private var deepLinkConversationId: String?
 
     var body: some View {
         NavigationStack {
@@ -89,6 +91,12 @@ struct MessagesContent: View {
             .task {
                 viewModel.setup(tenantContext: tenantContext, authManager: authManager)
                 await viewModel.loadConversations()
+
+                // Handle deep link from push notification
+                if case .message(let conversationId) = navigationState.pendingDestination {
+                    deepLinkConversationId = conversationId
+                    navigationState.clearPending()
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ import SwiftUI
 struct AttendanceContent: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(TenantContext.self) private var tenantContext
+    @Environment(NotificationNavigationState.self) private var navigationState
     @State private var viewModel = AttendanceViewModel()
 
     var body: some View {
@@ -130,6 +131,11 @@ struct AttendanceContent: View {
                 await viewModel.loadAttendanceForDate(viewModel.selectedDate)
                 await viewModel.loadStats()
                 await viewModel.loadTeacherClasses()
+
+                // Handle deep link from push notification
+                if case .attendance(_) = navigationState.pendingDestination {
+                    navigationState.clearPending()
+                }
             }
         }
     }

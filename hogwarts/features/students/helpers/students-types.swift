@@ -137,6 +137,41 @@ enum StudentFormMode {
     }
 }
 
+// MARK: - SwiftData Conversion
+
+extension Student {
+    /// Create API model from SwiftData model (for offline reads)
+    init(from model: StudentModel) {
+        self.init(
+            id: model.id,
+            grNumber: model.grNumber,
+            userId: model.userId,
+            schoolId: model.schoolId,
+            yearLevelId: model.yearLevelId,
+            batchId: model.batchId,
+            status: model.status,
+            givenName: model.givenName,
+            surname: model.surname,
+            givenNameAr: model.givenNameAr,
+            surnameAr: model.surnameAr,
+            dateOfBirth: model.dateOfBirth,
+            gender: model.gender,
+            nationality: model.nationality,
+            photoUrl: model.photoUrl,
+            email: model.email,
+            phone: model.phone,
+            address: model.address,
+            bloodType: model.bloodType,
+            allergies: model.allergies,
+            medicalConditions: model.medicalConditions,
+            createdAt: nil,
+            updatedAt: nil,
+            user: nil,
+            yearLevel: nil
+        )
+    }
+}
+
 // MARK: - Table Row
 
 /// Row type for students table

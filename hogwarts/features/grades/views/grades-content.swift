@@ -5,6 +5,7 @@ import SwiftUI
 struct GradesContent: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(TenantContext.self) private var tenantContext
+    @Environment(NotificationNavigationState.self) private var navigationState
     @State private var viewModel = GradesViewModel()
 
     var body: some View {
@@ -98,6 +99,11 @@ struct GradesContent: View {
                 await viewModel.loadResults()
                 if viewModel.capabilities.canEnterGrades {
                     await viewModel.loadExams()
+                }
+
+                // Handle deep link from push notification
+                if case .grade(_) = navigationState.pendingDestination {
+                    navigationState.clearPending()
                 }
             }
         }

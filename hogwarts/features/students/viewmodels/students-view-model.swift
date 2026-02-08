@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import os
 
 /// ViewModel for Students list
@@ -57,7 +58,7 @@ final class StudentsViewModel {
 
     // MARK: - Actions
 
-    /// Load students with current filters
+    /// Load students with current filters (offline-first)
     func loadStudents() async {
         guard let schoolId = tenantContext?.schoolId else {
             viewState = .error(StudentsError.unauthorized)
@@ -67,6 +68,7 @@ final class StudentsViewModel {
         viewState = .loading
 
         do {
+            // Online: fetch from API
             filters.page = currentPage
             let response = try await actions.getStudents(schoolId: schoolId, filters: filters)
 
@@ -78,10 +80,20 @@ final class StudentsViewModel {
 
             totalPages = response.totalPages
             totalCount = response.total
+
+            // Cache to SwiftData
+            cacheStudents(response.data, schoolId: schoolId)
         } catch {
-            viewState = .error(error)
-            self.error = error
-            showError = true
+            // Offline fallback: read from SwiftData
+            let cached = loadCachedStudents(schoolId: schoolId)
+            if !cached.isEmpty {
+                viewState = .loaded(cached)
+                totalCount = cached.count
+            } else {
+                viewState = .error(error)
+                self.error = error
+                showError = true
+            }
         }
     }
 
@@ -177,6 +189,41 @@ final class StudentsViewModel {
         for student in students {
             await deleteStudent(student)
         }
+    }
+
+    // MARK: - Form Submission
+
+    // MARK: - SwiftData Cache
+
+    /// Cache students to SwiftData
+    private func cacheStudents(_ students: [Student], schoolId: String) {
+        let context = DataContainer.shared.modelContext
+        for student in students {
+            let studentId = student.id
+            let descriptor = FetchDescriptor<StudentModel>(
+                predicate: #Predicate { $0.id == studentId }
+            )
+            if let existing = try? context.fetch(descriptor).first {
+                existing.update(from: student)
+                existing.lastSyncedAt = Date()
+            } else {
+                let model = StudentModel(from: student, schoolId: schoolId)
+                model.lastSyncedAt = Date()
+                context.insert(model)
+            }
+        }
+        try? context.save()
+    }
+
+    /// Load cached students from SwiftData
+    private func loadCachedStudents(schoolId: String) -> [Student] {
+        let context = DataContainer.shared.modelContext
+        let descriptor = FetchDescriptor<StudentModel>(
+            predicate: #Predicate { $0.schoolId == schoolId },
+            sortBy: [SortDescriptor(\.surname)]
+        )
+        guard let models = try? context.fetch(descriptor) else { return [] }
+        return models.map { Student(from: $0) }
     }
 
     // MARK: - Form Submission

@@ -52,6 +52,29 @@ struct GradeFilters {
     }
 }
 
+// MARK: - SwiftData Conversion
+
+extension ExamResult {
+    /// Create API model from SwiftData model (for offline reads)
+    init(from model: ExamResultModel) {
+        self.init(
+            id: model.id,
+            examId: model.examId,
+            studentId: model.studentId,
+            schoolId: model.schoolId,
+            marks: model.marks,
+            percentage: model.percentage,
+            grade: model.grade,
+            status: "GRADED",
+            remarks: model.remarks,
+            createdAt: nil,
+            updatedAt: nil,
+            exam: nil,
+            student: nil
+        )
+    }
+}
+
 // MARK: - View State
 
 enum GradesViewState {
