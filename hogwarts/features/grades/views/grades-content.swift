@@ -46,6 +46,19 @@ struct GradesContent: View {
                         }
                     }
                 }
+
+                if viewModel.capabilities.canViewGrades {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            GradeChartsView(
+                                results: viewModel.rows,
+                                reportCard: viewModel.reportCard
+                            )
+                        } label: {
+                            Image(systemName: "chart.bar")
+                        }
+                    }
+                }
             }
             .sheet(isPresented: $viewModel.isShowingForm) {
                 GradesForm(viewModel: viewModel)
@@ -182,6 +195,13 @@ struct StudentGradesContent: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // GPA summary card
+            if let reportCard = viewModel.reportCard {
+                GPASummaryCard(reportCard: reportCard)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+            }
+
             // Filter chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {

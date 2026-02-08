@@ -295,6 +295,19 @@ final class AttendanceActions: Sendable {
         )
     }
 
+    /// Get excuses submitted for a specific student (Guardian view)
+    func getStudentExcuses(
+        studentId: String,
+        schoolId: String
+    ) async throws -> [AttendanceExcuse] {
+        let params: [String: String] = [
+            "studentId": studentId,
+            "schoolId": schoolId
+        ]
+
+        return try await api.get("/attendance/excuses", query: params, as: [AttendanceExcuse].self)
+    }
+
     /// Get pending excuses for review (Teacher/Admin)
     func getPendingExcuses(
         schoolId: String,

@@ -214,12 +214,13 @@ struct StudentAttendanceContent: View {
     @State private var displayMode: AttendanceDisplayMode = .list
 
     enum AttendanceDisplayMode: String, CaseIterable {
-        case list, calendar
+        case list, calendar, charts
 
         var label: String {
             switch self {
             case .list: return String(localized: "attendance.view.list")
             case .calendar: return String(localized: "attendance.view.calendar")
+            case .charts: return String(localized: "attendance.view.charts")
             }
         }
 
@@ -227,6 +228,7 @@ struct StudentAttendanceContent: View {
             switch self {
             case .list: return "list.bullet"
             case .calendar: return "calendar"
+            case .charts: return "chart.pie"
             }
         }
     }
@@ -257,7 +259,19 @@ struct StudentAttendanceContent: View {
                     LoadingView()
 
                 case .loaded:
-                    if displayMode == .calendar {
+                    if displayMode == .charts {
+                        if let stats = viewModel.statsDisplay {
+                            ScrollView {
+                                AttendanceChartsView(
+                                    stats: stats,
+                                    records: viewModel.rows
+                                )
+                            }
+                            .refreshable {
+                                await viewModel.refresh()
+                            }
+                        }
+                    } else if displayMode == .calendar {
                         ScrollView {
                             AttendanceCalendarView(
                                 rows: viewModel.rows,
@@ -312,6 +326,21 @@ struct GuardianAttendanceContent: View {
                 AttendanceStatsCard(stats: stats)
                     .padding()
             }
+
+            // Excuse list link
+            NavigationLink {
+                ExcuseListView()
+            } label: {
+                Label(
+                    String(localized: "excuse.viewAll"),
+                    systemImage: "doc.text.magnifyingglass"
+                )
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.secondary.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .padding(.horizontal)
 
             // Excuse button
             if AttendanceValidation.canSubmitExcuse(for: viewModel.selectedDate) {

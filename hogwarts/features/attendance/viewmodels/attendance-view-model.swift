@@ -29,6 +29,7 @@ final class AttendanceViewModel {
 
     // Excuse state
     var pendingExcuses: [AttendanceExcuse] = []
+    var studentExcuses: [AttendanceExcuse] = []
     var isShowingExcuseForm = false
     var selectedExcuse: AttendanceExcuse?
 
@@ -191,6 +192,24 @@ final class AttendanceViewModel {
             classAttendanceState = .error(error)
             self.error = error
             showError = true
+        }
+    }
+
+    /// Load excuses for the current student (guardian view)
+    func loadStudentExcuses() async {
+        guard let schoolId = tenantContext?.schoolId,
+              let studentId = getStudentId() else {
+            return
+        }
+
+        do {
+            studentExcuses = try await actions.getStudentExcuses(
+                studentId: studentId,
+                schoolId: schoolId
+            )
+        } catch {
+            // Non-critical — don't block UI
+            print("Failed to load student excuses: \(error)")
         }
     }
 

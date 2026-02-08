@@ -4,9 +4,12 @@ import SwiftUI
 /// Mirrors: src/components/platform/profile/content.tsx
 struct ProfileContent: View {
     @Environment(AuthManager.self) private var authManager
+    @Environment(TenantContext.self) private var tenantContext
     @Environment(\.locale) private var locale
 
+    @State private var viewModel = ProfileViewModel()
     @State private var showLogoutAlert = false
+    @AppStorage("appTheme") private var appTheme: String = AppTheme.system.rawValue
 
     var body: some View {
         NavigationStack {
@@ -45,13 +48,14 @@ struct ProfileContent: View {
                 // Settings
                 Section(String(localized: "profile.settings")) {
                     NavigationLink {
-                        Text("Edit Profile")
+                        EditProfileView(viewModel: viewModel)
                     } label: {
                         Label(String(localized: "profile.editProfile"), systemImage: "person")
                     }
 
                     NavigationLink {
-                        Text("Notifications")
+                        NotificationPreferencesView()
+                            .environment(tenantContext)
                     } label: {
                         Label(String(localized: "profile.notifications"), systemImage: "bell")
                     }
@@ -62,10 +66,26 @@ struct ProfileContent: View {
                         Label(String(localized: "profile.language"), systemImage: "globe")
                     }
 
-                    NavigationLink {
-                        Text("Appearance")
-                    } label: {
-                        Label(String(localized: "profile.appearance"), systemImage: "paintbrush")
+                    // Biometric toggle (if available)
+                    biometricToggleRow
+                }
+
+                // Appearance (inline theme picker)
+                Section(String(localized: "profile.appearance")) {
+                    ForEach(AppTheme.allCases, id: \.self) { theme in
+                        Button {
+                            appTheme = theme.rawValue
+                        } label: {
+                            HStack {
+                                Label(theme.displayName, systemImage: theme.icon)
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if appTheme == theme.rawValue {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(Color.accentColor)
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -100,12 +120,42 @@ struct ProfileContent: View {
             ) {
                 Button(String(localized: "common.cancel"), role: .cancel) {}
                 Button(String(localized: "profile.logout"), role: .destructive) {
-                    authManager.signOut()
+                    viewModel.signOut()
                 }
             } message: {
                 Text(String(localized: "profile.logout.message"))
             }
+            .task {
+                viewModel.setup(authManager: authManager, tenantContext: tenantContext)
+            }
         }
+    }
+
+    // MARK: - Biometric Toggle
+
+    @ViewBuilder
+    private var biometricToggleRow: some View {
+        if let biometricService = try? getBiometricService(), biometricService.isBiometricAvailable {
+            Toggle(isOn: Binding(
+                get: { biometricService.isBiometricEnabled },
+                set: { enabled in
+                    if enabled {
+                        try? biometricService.enableBiometric()
+                    } else {
+                        biometricService.disableBiometric()
+                    }
+                }
+            )) {
+                Label(biometricService.biometricName, systemImage: biometricService.biometricIcon)
+            }
+        }
+    }
+
+    /// Try to get BiometricService from environment
+    /// Returns nil if not injected (graceful degradation)
+    @Environment(BiometricService.self) private var biometricServiceEnv
+    private func getBiometricService() throws -> BiometricService {
+        biometricServiceEnv
     }
 }
 
@@ -149,4 +199,6 @@ struct LanguageSettingsView: View {
 #Preview {
     ProfileContent()
         .environment(AuthManager())
+        .environment(TenantContext())
+        .environment(BiometricService())
 }

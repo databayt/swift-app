@@ -159,11 +159,104 @@ actor SyncEngine {
     }
 
     private func syncMessages() async {
-        // Implementation will fetch from API and update SwiftData
+        // Fetch recent conversations and cache in SwiftData
+        await MainActor.run {
+            let context = DataContainer.shared.modelContext
+
+            // Get schoolId from most recent user
+            let userDescriptor = FetchDescriptor<UserModel>(
+                sortBy: [SortDescriptor(\.lastSyncedAt, order: .reverse)]
+            )
+            guard let user = try? context.fetch(userDescriptor).first,
+                  let schoolId = user.schoolId else { return }
+
+            Task {
+                do {
+                    let conversations: [Conversation] = try await api.get(
+                        "/conversations",
+                        query: ["schoolId": schoolId],
+                        as: [Conversation].self
+                    )
+
+                    await MainActor.run {
+                        for conv in conversations {
+                            let descriptor = FetchDescriptor<ConversationModel>(
+                                predicate: #Predicate { $0.id == conv.id }
+                            )
+
+                            if let existing = try? context.fetch(descriptor).first {
+                                existing.name = conv.name
+                                existing.updatedAt = conv.updatedAt
+                                existing.lastSyncedAt = Date()
+                            } else {
+                                let model = ConversationModel(id: conv.id, schoolId: schoolId)
+                                model.name = conv.name
+                                model.isGroup = conv.isGroup
+                                model.lastSyncedAt = Date()
+                                context.insert(model)
+                            }
+                        }
+
+                        try? context.save()
+                    }
+                } catch {
+                    // Non-critical — will retry on next sync
+                }
+            }
+        }
     }
 
     private func syncNotifications() async {
-        // Implementation will fetch from API and update SwiftData
+        // Fetch recent notifications and cache in SwiftData
+        await MainActor.run {
+            let context = DataContainer.shared.modelContext
+
+            // Get schoolId from most recent user
+            let userDescriptor = FetchDescriptor<UserModel>(
+                sortBy: [SortDescriptor(\.lastSyncedAt, order: .reverse)]
+            )
+            guard let user = try? context.fetch(userDescriptor).first,
+                  let schoolId = user.schoolId else { return }
+
+            Task {
+                do {
+                    let notifications: [AppNotification] = try await api.get(
+                        "/notifications",
+                        query: ["schoolId": schoolId],
+                        as: [AppNotification].self
+                    )
+
+                    await MainActor.run {
+                        for notif in notifications {
+                            let descriptor = FetchDescriptor<NotificationModel>(
+                                predicate: #Predicate { $0.id == notif.id }
+                            )
+
+                            if let existing = try? context.fetch(descriptor).first {
+                                existing.isRead = notif.isRead
+                                existing.lastSyncedAt = Date()
+                            } else {
+                                let model = NotificationModel(
+                                    id: notif.id,
+                                    userId: notif.userId,
+                                    type: notif.type,
+                                    title: notif.title,
+                                    message: notif.message,
+                                    schoolId: schoolId
+                                )
+                                model.isRead = notif.isRead
+                                model.lastSyncedAt = Date()
+                                context.insert(model)
+                            }
+                        }
+
+                        try? context.save()
+                    }
+                } catch {
+                    // Non-critical — will retry on next sync
+                }
+            }
+        }
     }
 }
 

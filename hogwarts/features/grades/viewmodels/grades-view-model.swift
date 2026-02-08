@@ -104,6 +104,11 @@ final class GradesViewModel {
 
             totalPages = response.totalPages
             totalCount = response.total
+
+            // Auto-load report card for student/guardian roles (for GPA card)
+            if !capabilities.canEnterGrades && reportCard == nil {
+                await loadReportCard()
+            }
         } catch {
             viewState = .error(error)
             self.error = error
