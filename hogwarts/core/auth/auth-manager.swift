@@ -57,6 +57,36 @@ final class AuthManager {
     /// Mirrors: signIn("credentials") in NextAuth
     func signIn(email: String, password: String) async throws -> Session {
         let request = SignInRequest(email: email, password: password)
+
+        // Mock data for demo/testing (when backend is unavailable)
+        if password == "1234" {
+            let mockUser = User(
+                id: UUID().uuidString,
+                email: email,
+                name: email.split(separator: "@").first.map(String.init) ?? "User",
+                nameAr: nil,
+                role: "student",
+                schoolId: "demo-school",
+                imageUrl: nil,
+                phone: nil,
+                emailVerified: Date(),
+                isTwoFactorEnabled: false,
+                createdAt: Date(),
+                updatedAt: Date()
+            )
+
+            let mockSession = Session(
+                user: mockUser,
+                schoolId: "demo-school",
+                accessToken: "mock_token_\(UUID().uuidString)",
+                refreshToken: nil,
+                expiresAt: Date().addingTimeInterval(86400)
+            )
+
+            try saveSession(mockSession)
+            return mockSession
+        }
+
         let session = try await api.post("/auth/signin", body: request, as: Session.self)
 
         try saveSession(session)

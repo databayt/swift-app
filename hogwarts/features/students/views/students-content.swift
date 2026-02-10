@@ -93,6 +93,8 @@ struct StudentsContent: View {
                     }
                 )
             }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
             .alert(
                 String(localized: "error.title"),
                 isPresented: $viewModel.showError,

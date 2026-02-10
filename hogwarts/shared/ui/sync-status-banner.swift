@@ -13,10 +13,13 @@ struct SyncStatusBanner: View {
             HStack(spacing: 8) {
                 Image(systemName: "wifi.slash")
                     .accessibilityHidden(true)
+
                 Text(String(localized: "sync.offline"))
                     .font(.subheadline)
                     .fontWeight(.medium)
+
                 Spacer()
+
                 if let lastSyncedAt {
                     Text(lastSyncedText(lastSyncedAt))
                         .font(.caption)
@@ -24,9 +27,16 @@ struct SyncStatusBanner: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(.red.opacity(0.9))
-            .foregroundStyle(.white)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color(red: 1, green: 0.2, blue: 0.2).opacity(0.1))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(Color(red: 1, green: 0.2, blue: 0.2).opacity(0.3), lineWidth: 1)
+                    }
+            )
+            .foregroundStyle(Color(red: 1, green: 0.2, blue: 0.2))
             .transition(.move(edge: .top).combined(with: .opacity))
             .accessibilityElement(children: .combine)
             .accessibilityLabel(String(localized: "a11y.sync.offlineBanner"))

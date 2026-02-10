@@ -132,8 +132,15 @@ struct StudentDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(.quaternary)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(
+            .regularMaterial,
+            in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(.quaternary, lineWidth: 0.5)
+        }
+        .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
     }
 
     // MARK: - Info Section
@@ -223,9 +230,15 @@ struct StudentDetailView: View {
                 }
             }
             .padding()
-            .background(.background)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
+            .background(
+                .thinMaterial,
+                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(.quaternary, lineWidth: 0.5)
+            }
+            .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
         }
     }
 
@@ -290,9 +303,15 @@ struct DetailSection<Content: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(.background)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
+        .background(
+            .thinMaterial,
+            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(.quaternary, lineWidth: 0.5)
+        }
+        .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
     }
 }
 

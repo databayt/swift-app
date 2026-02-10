@@ -10,80 +10,92 @@ struct ClassDetailView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                // Class info section
-                Section(String(localized: "timetable.classInfo")) {
-                    LabeledContent(
-                        String(localized: "timetable.className"),
-                        value: classDetail.displayName
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Class Info Card
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(String(localized: "timetable.classInfo"))
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+
+                        VStack(spacing: 8) {
+                            InfoRow(
+                                label: String(localized: "timetable.className"),
+                                value: classDetail.displayName
+                            )
+
+                            if let subject = classDetail.displaySubject {
+                                InfoRow(
+                                    label: String(localized: "timetable.subject"),
+                                    value: subject
+                                )
+                            }
+
+                            if let teacher = classDetail.teacherName {
+                                InfoRow(
+                                    label: String(localized: "timetable.teacher"),
+                                    value: teacher
+                                )
+                            }
+
+                            if let room = classDetail.room {
+                                InfoRow(
+                                    label: String(localized: "timetable.room"),
+                                    value: room
+                                )
+                            }
+
+                            if let count = classDetail.studentCount {
+                                InfoRow(
+                                    label: String(localized: "timetable.studentCount"),
+                                    value: "\(count)"
+                                )
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(
+                        .regularMaterial,
+                        in: RoundedRectangle(cornerRadius: 16, style: .continuous)
                     )
-                    .accessibilityElement(children: .combine)
-
-                    if let subject = classDetail.displaySubject {
-                        LabeledContent(
-                            String(localized: "timetable.subject"),
-                            value: subject
-                        )
-                        .accessibilityElement(children: .combine)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .strokeBorder(.quaternary, lineWidth: 0.5)
                     }
+                    .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
 
-                    if let teacher = classDetail.teacherName {
-                        LabeledContent(
-                            String(localized: "timetable.teacher"),
-                            value: teacher
-                        )
-                        .accessibilityElement(children: .combine)
-                    }
+                    // Students List Card (teachers/admin only)
+                    if capabilities.canViewStudentList,
+                       let students = classDetail.students, !students.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(String(localized: "timetable.students") + " (\(students.count))")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
 
-                    if let room = classDetail.room {
-                        LabeledContent(
-                            String(localized: "timetable.room"),
-                            value: room
-                        )
-                        .accessibilityElement(children: .combine)
-                    }
+                            VStack(spacing: 0) {
+                                ForEach(students) { student in
+                                    StudentRowGlass(student: student)
 
-                    if let count = classDetail.studentCount {
-                        LabeledContent(
-                            String(localized: "timetable.studentCount"),
-                            value: "\(count)"
-                        )
-                        .accessibilityElement(children: .combine)
-                    }
-                }
-
-                // Student list section (teachers/admin only)
-                if capabilities.canViewStudentList,
-                   let students = classDetail.students, !students.isEmpty {
-                    Section(String(localized: "timetable.students")) {
-                        ForEach(students) { student in
-                            HStack(spacing: 12) {
-                                AsyncImage(url: URL(string: student.imageUrl ?? "")) { image in
-                                    image.resizable().scaledToFill()
-                                } placeholder: {
-                                    Image(systemName: "person.circle.fill")
-                                        .resizable()
-                                        .foregroundStyle(.secondary)
-                                }
-                                .frame(width: 36, height: 36)
-                                .clipShape(Circle())
-                                .accessibilityHidden(true)
-
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(student.displayName)
-                                        .font(.subheadline)
-                                    if let gr = student.grNumber {
-                                        Text(gr)
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                                    if student.id != students.last?.id {
+                                        Divider()
+                                            .padding(.leading, 52)
                                     }
                                 }
                             }
-                            .padding(.vertical, 2)
-                            .accessibilityElement(children: .combine)
                         }
+                        .padding()
+                        .background(
+                            .thinMaterial,
+                            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        )
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .strokeBorder(.quaternary, lineWidth: 0.5)
+                        }
+                        .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
                     }
                 }
+                .padding()
             }
             .navigationTitle(String(localized: "timetable.classDetail"))
             .navigationBarTitleDisplayMode(.inline)
@@ -96,5 +108,57 @@ struct ClassDetailView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Helper Components
+
+struct InfoRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(value)
+                .fontWeight(.medium)
+        }
+        .font(.subheadline)
+    }
+}
+
+struct StudentRowGlass: View {
+    let student: ClassStudent
+
+    var body: some View {
+        HStack(spacing: 12) {
+            AsyncImage(url: URL(string: student.imageUrl ?? "")) { image in
+                image.resizable().scaledToFill()
+            } placeholder: {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .foregroundStyle(.secondary)
+            }
+            .frame(width: 40, height: 40)
+            .clipShape(Circle())
+            .overlay(Circle().strokeBorder(.quaternary, lineWidth: 0.5))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(student.displayName)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                if let gr = student.grNumber {
+                    Text(gr)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 8)
     }
 }

@@ -95,6 +95,8 @@ struct AttendanceContent: View {
                     )
                 }
             }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
             .sheet(isPresented: $viewModel.isShowingQRScanner) {
                 QRScannerView(viewModel: viewModel)
             }

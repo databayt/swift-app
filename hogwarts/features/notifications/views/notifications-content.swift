@@ -71,6 +71,11 @@ struct NotificationsContent: View {
                                                         await viewModel.markAsRead(notification)
                                                     }
                                                 }
+                                                .listRowBackground(
+                                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                                        .fill(Color(UIColor.systemBackground).opacity(0.5))
+                                                        .padding(.vertical, 4)
+                                                )
                                                 .swipeActions(edge: .trailing) {
                                                     Button(role: .destructive) {
                                                         Task {
@@ -99,9 +104,10 @@ struct NotificationsContent: View {
                                                 }
                                         }
                                     }
+                                    .headerProminence(.increased)
                                 }
                             }
-                            .listStyle(.plain)
+                            .listStyle(.insetGrouped)
                             .refreshable {
                                 await viewModel.refresh()
                             }

@@ -120,6 +120,8 @@ struct ProfileContent: View {
                     .accessibilityLabel(String(localized: "a11y.button.logout"))
                 }
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
             .navigationTitle(String(localized: "profile.title"))
             .alert(
                 String(localized: "profile.logout.title"),

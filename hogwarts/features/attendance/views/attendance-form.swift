@@ -199,9 +199,15 @@ struct ClassAttendanceForm: View {
                 List {
                     ForEach($viewModel.markRows) { $row in
                         StudentMarkRow(row: $row)
+                            .listRowBackground(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(Color(UIColor.systemBackground).opacity(0.5))
+                                    .padding(.vertical, 4)
+                            )
                     }
                 }
-                .listStyle(.plain)
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
 
             case .error(let error):
                 ErrorStateView(

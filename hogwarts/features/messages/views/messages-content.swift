@@ -26,9 +26,14 @@ struct MessagesContent: View {
                             } label: {
                                 ConversationRow(conversation: conversation)
                             }
+                            .listRowBackground(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(Color(UIColor.systemBackground).opacity(0.5))
+                                    .padding(.vertical, 4)
+                            )
                         }
                     }
-                    .listStyle(.plain)
+                    .listStyle(.insetGrouped)
                     .refreshable {
                         await viewModel.refresh()
                     }

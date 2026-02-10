@@ -68,6 +68,8 @@ struct GradesContent: View {
                 GradesForm(viewModel: viewModel)
                     .environment(tenantContext)
             }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
             .sheet(isPresented: $viewModel.isShowingReportCard) {
                 if let reportCard = viewModel.reportCard {
                     ReportCardView(reportCard: reportCard)

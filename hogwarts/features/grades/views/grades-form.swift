@@ -301,9 +301,15 @@ struct EnterMarksForm: View {
                             totalMarks: exam.totalMarks,
                             error: errors[row.studentId]
                         )
+                        .listRowBackground(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color(UIColor.systemBackground).opacity(0.5))
+                                .padding(.vertical, 4)
+                        )
                     }
                 }
-                .listStyle(.plain)
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
 
                 // Submit button
                 Button {

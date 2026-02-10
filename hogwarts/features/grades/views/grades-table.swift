@@ -14,9 +14,14 @@ struct GradesTable: View {
                     .onTapGesture {
                         onSelect?(row)
                     }
+                    .listRowBackground(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color(UIColor.systemBackground).opacity(0.5))
+                            .padding(.vertical, 4)
+                    )
             }
         }
-        .listStyle(.plain)
+        .listStyle(.insetGrouped)
     }
 }
 
@@ -43,6 +48,7 @@ struct ExamResultRowView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(row.examTitle)
                     .font(.headline)
+                    .fontWeight(.semibold)
                     .lineLimit(1)
 
                 HStack(spacing: 6) {
@@ -50,7 +56,7 @@ struct ExamResultRowView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
 
-                    Text("\u{2022}")
+                    Text("•")
                         .foregroundStyle(.tertiary)
 
                     Text(row.examType.displayName)
@@ -59,7 +65,7 @@ struct ExamResultRowView: View {
                 }
 
                 Text(row.examDate)
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
 
