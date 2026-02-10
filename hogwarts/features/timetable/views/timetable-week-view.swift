@@ -38,7 +38,14 @@ struct TimetableWeekView: View {
                     }
                 }
                 .padding(.vertical, 8)
-                .background(.quaternary)
+                .background(
+                    .thinMaterial,
+                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(.quaternary, lineWidth: 0.5)
+                }
                 .accessibilityElement(children: .contain)
 
                 Divider()
@@ -112,8 +119,14 @@ struct WeekCellView: View {
                 }
                 .padding(4)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(isToday ? Color.blue.opacity(0.1) : Color.secondary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .background(
+                    isToday ? Material.thin : Material.ultraThin,
+                    in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(.quaternary.opacity(0.5), lineWidth: 0.5)
+                }
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(entry.displayName + (entry.classroomName.map { ", \($0)" } ?? ""))
                 .accessibilityHint(String(localized: "a11y.timetable.tapForDetails"))

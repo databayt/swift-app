@@ -28,7 +28,7 @@ struct MessagesContent: View {
                             }
                             .listRowBackground(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(Color(UIColor.systemBackground).opacity(0.5))
+                                    .fill(.thinMaterial)
                                     .padding(.vertical, 4)
                             )
                         }

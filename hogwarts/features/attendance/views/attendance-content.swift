@@ -501,7 +501,15 @@ struct AttendanceStatsBar: View {
             )
         }
         .padding()
-        .background(.quaternary)
+        .background(
+            .thinMaterial,
+            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(.quaternary, lineWidth: 0.5)
+        }
+        .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(localized: "a11y.attendance.statsBar"))
     }
@@ -558,8 +566,15 @@ struct AttendanceStatsCard: View {
             }
         }
         .padding()
-        .background(.quaternary)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .background(
+            .regularMaterial,
+            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(.quaternary, lineWidth: 0.5)
+        }
+        .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(localized: "a11y.attendance.statsCard"))
     }

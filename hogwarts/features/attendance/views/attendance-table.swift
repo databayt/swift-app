@@ -13,10 +13,30 @@ struct AttendanceTable: View {
         List(selection: $selection) {
             ForEach(rows) { row in
                 AttendanceRowView(row: row)
+                    .listRowBackground(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(.thinMaterial)
+                            .padding(.vertical, 4)
+                    )
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if canEdit {
                             onEdit?(row)
+                        }
+                    }
+                    .contextMenu {
+                        if canEdit {
+                            Button {
+                                onEdit?(row)
+                            } label: {
+                                Label(String(localized: "common.edit"), systemImage: "pencil")
+                            }
+
+                            Button {
+                                UIPasteboard.general.string = row.studentName
+                            } label: {
+                                Label(String(localized: "common.copy"), systemImage: "doc.on.doc")
+                            }
                         }
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -31,7 +51,7 @@ struct AttendanceTable: View {
                     }
             }
         }
-        .listStyle(.plain)
+        .listStyle(.insetGrouped)
     }
 }
 

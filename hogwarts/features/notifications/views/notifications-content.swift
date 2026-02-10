@@ -73,9 +73,40 @@ struct NotificationsContent: View {
                                                 }
                                                 .listRowBackground(
                                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                                        .fill(Color(UIColor.systemBackground).opacity(0.5))
+                                                        .fill(.thinMaterial)
                                                         .padding(.vertical, 4)
                                                 )
+                                                .contextMenu {
+                                                    if !notification.isRead {
+                                                        Button {
+                                                            Task {
+                                                                await viewModel.markAsRead(notification)
+                                                            }
+                                                        } label: {
+                                                            Label(
+                                                                String(localized: "notification.markRead"),
+                                                                systemImage: "envelope.open"
+                                                            )
+                                                        }
+                                                    }
+
+                                                    Button {
+                                                        UIPasteboard.general.string = notification.title
+                                                    } label: {
+                                                        Label(String(localized: "common.copy"), systemImage: "doc.on.doc")
+                                                    }
+
+                                                    Button(role: .destructive) {
+                                                        Task {
+                                                            await viewModel.deleteNotification(notification)
+                                                        }
+                                                    } label: {
+                                                        Label(
+                                                            String(localized: "common.delete"),
+                                                            systemImage: "trash"
+                                                        )
+                                                    }
+                                                }
                                                 .swipeActions(edge: .trailing) {
                                                     Button(role: .destructive) {
                                                         Task {
